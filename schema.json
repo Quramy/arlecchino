@@ -1,0 +1,389 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "anyOf": [
+    {
+      "properties": {
+        "configuration": {
+          "properties": {
+            "base_uri": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "scenario": {
+          "anyOf": [
+            {
+              "properties": {
+                "configuration": {
+                  "properties": {
+                    "base_uri": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "steps": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "goto": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      {
+                        "properties": {
+                          "find": {
+                            "properties": {
+                              "action": {
+                                "anyOf": [
+                                  {
+                                    "properties": {
+                                      "input": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "object"
+                                  },
+                                  {
+                                    "items": {
+                                      "anyOf": [
+                                        {
+                                          "properties": {
+                                            "input": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "type": "object"
+                                        },
+                                        {
+                                          "enum": [
+                                            "click"
+                                          ],
+                                          "type": "string"
+                                        }
+                                      ]
+                                    },
+                                    "type": "array"
+                                  },
+                                  {
+                                    "enum": [
+                                      "click"
+                                    ],
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "query": {
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      {
+                        "enum": [
+                          "screenshot",
+                          "wait_for_navigation"
+                        ],
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            {
+              "items": {
+                "properties": {
+                  "configuration": {
+                    "properties": {
+                      "base_uri": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "steps": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "properties": {
+                            "goto": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "find": {
+                              "properties": {
+                                "action": {
+                                  "anyOf": [
+                                    {
+                                      "properties": {
+                                        "input": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "object"
+                                    },
+                                    {
+                                      "items": {
+                                        "anyOf": [
+                                          {
+                                            "properties": {
+                                              "input": {
+                                                "type": "string"
+                                              }
+                                            },
+                                            "type": "object"
+                                          },
+                                          {
+                                            "enum": [
+                                              "click"
+                                            ],
+                                            "type": "string"
+                                          }
+                                        ]
+                                      },
+                                      "type": "array"
+                                    },
+                                    {
+                                      "enum": [
+                                        "click"
+                                      ],
+                                      "type": "string"
+                                    }
+                                  ]
+                                },
+                                "query": {
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "enum": [
+                            "screenshot",
+                            "wait_for_navigation"
+                          ],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    {
+      "properties": {
+        "configuration": {
+          "properties": {
+            "base_uri": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "description": {
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "anyOf": [
+              {
+                "properties": {
+                  "goto": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "find": {
+                    "properties": {
+                      "action": {
+                        "anyOf": [
+                          {
+                            "properties": {
+                              "input": {
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "properties": {
+                                    "input": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                {
+                                  "enum": [
+                                    "click"
+                                  ],
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "type": "array"
+                          },
+                          {
+                            "enum": [
+                              "click"
+                            ],
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "query": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              {
+                "enum": [
+                  "screenshot",
+                  "wait_for_navigation"
+                ],
+                "type": "string"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    {
+      "items": {
+        "properties": {
+          "configuration": {
+            "properties": {
+              "base_uri": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "description": {
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "anyOf": [
+                {
+                  "properties": {
+                    "goto": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                {
+                  "properties": {
+                    "find": {
+                      "properties": {
+                        "action": {
+                          "anyOf": [
+                            {
+                              "properties": {
+                                "input": {
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            },
+                            {
+                              "items": {
+                                "anyOf": [
+                                  {
+                                    "properties": {
+                                      "input": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "object"
+                                  },
+                                  {
+                                    "enum": [
+                                      "click"
+                                    ],
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "type": "array"
+                            },
+                            {
+                              "enum": [
+                                "click"
+                              ],
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "query": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                {
+                  "enum": [
+                    "screenshot",
+                    "wait_for_navigation"
+                  ],
+                  "type": "string"
+                }
+              ]
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  ]
+}
+
