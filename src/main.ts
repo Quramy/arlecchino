@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-import { load, createRootModel } from "./compile";
+import { compile } from "./compile";
 import { Context, run } from "./runner";
 
 async function main() {
-  const rootSchema = load("./example.yml");
-  const rootModel = createRootModel(rootSchema);
+  const { rootModel } = compile("./example.yml");
   console.log(JSON.stringify(rootModel, null, 2));
 
   const ctx = new Context();

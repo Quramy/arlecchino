@@ -22,21 +22,22 @@
 
 configuration:
   base_uri: https://google.co.jp
-description: Search TypeScript via Google
-steps:
-  - goto: /search
-  - find:
-      query: input[name='q']
-      action:
-        input: TypeScript
-  - screenshot
-  - find:
-      query: input[type='submit']
-      action: click
-  - wait_for_navigation
-  - find:
-      query: .srg h3 > a
-      action: click
-  - wait_for_navigation
-  - screenshot
-
+scenario:
+  description: Search TypeScript via Google
+  steps:
+    - goto: /search
+    - find:
+        query: input[name='q']
+        action:
+          input: TypeScript
+    - screenshot
+    - find:
+        query: input[type='submit']
+        action: click
+    - wait_for_navigation
+    - find:
+        query: .srg a
+        action: click
+    - wait_for_navigation
+    - screenshot
+  

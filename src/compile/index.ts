@@ -1,131 +1,174 @@
 import fs from "fs";
-import * as yaml from "js-yaml";
-import * as yap from "yaml-ast-parser";
-import * as schema from "../schema";
+import {
+  load as loadYaml,
+  YAMLNode,
+  YAMLSequence,
+  YAMLMapping,
+} from "yaml-ast-parser";
+// import * as schema from "../schema";
 import * as model from "../model";
 
-export function load(name: string) {
+export function compile(name: string) {
   const txt = fs.readFileSync(name, "utf8");
-  const obj = yaml.load(txt);
-  const x = yap.load(txt);
-  console.log(x);
-  return obj as schema.Root;
+  const metadataMap: Map<any, YAMLNode> = new Map();
+  const rootModel = createRootModel(loadYaml(txt), metadataMap);
+  return {
+    rootModel,
+    metadataMap,
+  };
 }
 
-export function createRootModel(obj: schema.Root) {
-  let m: model.RootModel;
-  if (isSuiteSchema(obj)) {
-    m = {
-      configuration: createConfigurationModel(obj.configuration),
-      scenarios: createScenarioModels(obj.scenario),
-    };
+export type MetadataMap = Map<any, YAMLNode>;
+
+function isSuiteSchema(node: YAMLNode) {
+  return hasKey(node, "scenario");
+}
+function createRootModel(node: YAMLNode, metadataMap: MetadataMap) {
+  let m: any = { };
+  if (isSuiteSchema(node)) {
+    node.mappings.forEach((n: YAMLMapping) => {
+      if (n.key.value === "configuration") {
+        m.configuration = createConfigurationModel(n.value, metadataMap);
+      } else if (n.key.value === "scenario") {
+        m.scenarios = createScenarioModels(n.value, metadataMap);
+      }
+    });
   } else {
     m = {
-      configuration: createDefaultConfigurationModel(),
-      scenarios: createScenarioModels(obj),
+      configuration: {},
+      scenarios: createScenarioModels(node, metadataMap),
     };
   }
+  metadataMap.set(m, node);
   return m;
 }
 
-function isSuiteSchema(x: schema.Root): x is schema.Suite {
-  return (x as any).scenario;
-}
-
-function createDefaultConfigurationModel(): model.Configuration {
-  return { };
-}
-
-function createConfigurationModel(c?: schema.Configuration): model.Configuration {
-  if (!c) return createDefaultConfigurationModel();
-  return {
-    baseUri: c.base_uri,
-  };
-}
-
-function createScenarioModels(s: schema.Scenario | schema.Scenario[]): model.Scenario[] {
-  return normalizeOneOrMany(s).map(ss => {
-    return {
-      configuration: createConfigurationModel(ss.configuration),
-      description: ss.description,
-      steps: createStepModels(ss.steps),
-    } as model.Scenario;
+function createScenarioModels(n: YAMLNode, metadataMap: MetadataMap): any {
+  return normalizeOneOrMany(n).map(node => {
+    const obj: any = { };
+    node.mappings.forEach((n: YAMLMapping) => {
+      const key = n.key.value;
+      if (key === "configuration") {
+        obj.configuration = createConfigurationModel(n.value, metadataMap);
+      } else if (key === "description") {
+        obj.description = n.value.value;
+      } else if (key === "steps") {
+        obj.steps = createStepModels(n.value as YAMLSequence, metadataMap);
+      } else {
+        // obj[key] = visitNode(n.value);
+      }
+    });
+    metadataMap.set(obj, node);
+    return obj;
   });
 }
 
-function createStepModels(s: schema.Step[]): model.Step[] {
-  return s.map(step => {
-    if (isScreenshotStepNode(step)) {
-      return createScreenshotStepModel(step);
-    } else if (isWaitForNavigationStepNode(step)) {
-      return createWaitForNavigationStepModel(step);
-    } else if (isGotoStepNode(step)) {
-      return createGotoStepModel(step);
-    } else if (isFindStepNode(step)) {
-      return createFindStepModel(step);
+function createConfigurationModel(node: YAMLNode, metadataMap: Map<any, YAMLNode>): model.Configuration {
+  const obj: any = { };
+  node.mappings.forEach((n: YAMLMapping) => {
+    if (n.key.value === "base_uri") {
+      obj.baseUri = n.value.value;
     } else {
-      throw new NoMatchedTypeError(step);
+      throw new Error("invalid key");
     }
   });
+  metadataMap.set(obj, node);
+  return obj;
 }
 
-function isGotoStepNode(x: schema.Step): x is schema.GotoStep {
-  return !!(x as any).goto;
+function createStepModels(node: YAMLSequence, metadataMap: MetadataMap): model.Step[] {
+  const ret: any[] = [];
+  node.items.forEach(n => {
+    if (isScreenshotStepNode(n)) {
+      ret.push(createScreenshotStepModel(n, metadataMap));
+    } else if (isGotoStepNode(n)) {
+      ret.push(createGotoStepModel(n, metadataMap));
+    } else if (isWaitForNavigationStepNode(n)) {
+      ret.push(createWaitForNavigationStepModel(n, metadataMap));
+    } else if (isFindStepNode(n)) {
+      ret.push(createFindStepModel(n, metadataMap));
+    }
+  });
+  return ret;
 }
-function createGotoStepModel(s: schema.GotoStep): model.GotoStep {
-  return {
+
+function isGotoStepNode(node: YAMLNode) {
+  return hasKey(node, "goto");
+}
+function createGotoStepModel(node: YAMLNode, metadataMap: MetadataMap): model.GotoStep {
+  const obj = {
     type: "goto",
-    urlFragment: s.goto,
-  };
+    urlFragment: node.mappings[0].value.value,
+  } as any;
+  metadataMap.set(obj, node);
+  return obj;
 }
 
-function isWaitForNavigationStepNode(x: schema.Step): x is schema.WaitForNavigationStep {
-  return x === "wait_for_navigation";
+function isWaitForNavigationStepNode(node: YAMLNode) {
+  return node.value === "wait_for_navigation";
 }
-function createWaitForNavigationStepModel(s: schema.WaitForNavigationStep): model.WaitForNavigationStep {
-  return {
+function createWaitForNavigationStepModel(node: YAMLNode, metadataMap: MetadataMap): model.WaitForNavigationStep {
+  const obj = {
     type: "waitForNavigation",
     timeout: 10_000,
-  };
+  } as any;
+  metadataMap.set(obj, node);
+  return obj;
 }
 
-function isScreenshotStepNode(x: schema.Step): x is schema.ScreenshotStep {
-  return x === "screenshot";
+function isScreenshotStepNode(n: YAMLNode) {
+  return n.value === "screenshot";
 }
-function createScreenshotStepModel(s: schema.ScreenshotStep): model.ScreenshotStep {
-  return {
+function createScreenshotStepModel(node: YAMLNode, metadataMap: MetadataMap): model.ScreenshotStep {
+  const obj = {
     type: "screenshot",
     fullPage: true,
-  };
+  } as model.ScreenshotStep;
+  metadataMap.set(obj, node);
+  return obj;
 }
 
-function isFindStepNode(x: schema.Step): x is schema.FindStep {
-  return (x as any).find;
+function isFindStepNode(node: YAMLNode) {
+  return hasKey(node, "find");
 }
-function createFindStepModel(s: schema.FindStep): model.FindStep {
-  return {
+function createFindStepModel(node: YAMLNode, metadataMap: MetadataMap): model.FindStep {
+  const ret: any = {
     type: "find",
-    query: s.find.query,
-    actions: createFindStepActionModels(s.find.action),
-    child: s.find.find ? createFindStepModel(s.find.find) : undefined,
   };
-}
-
-function createFindStepActionModels(s?: schema.FindAction | schema.FindAction[]): model.FindStepAction[] {
-  return normalizeOneOrMany(s).map(a => {
-    if (a === "click") {
-      return {
-        type: "click",
-      } as model.ClickAction;
-    } else if (a.input) {
-      return {
-        type: "textInput",
-        value: a.input,
-      } as model.TextInputAction;
-    } else {
-      throw new NoMatchedTypeError(s);
+  node.mappings[0].value.mappings.forEach((n: YAMLMapping) => {
+    if (n.key.value === "query") {
+      ret.query = n.value.value;
+    } else if (n.key.value === "action") {
+      ret.actions = createFindStepActionModels(n.value, metadataMap);
+    } else if (n.key.value === "find") {
+      ret.child = createFindStepModel(n.value.value, metadataMap);
     }
   });
+  metadataMap.set(ret, node);
+  return ret;
+}
+
+function createFindStepActionModels(node: YAMLNode, metadataMap: MetadataMap): model.FindStepAction[] {
+  const actions = normalizeOneOrMany(node).map(x => {
+    const obj = { } as any;
+    if (x.value === "click") {
+      obj.type = "click";
+    } else {
+      x.mappings.forEach((n: YAMLMapping) => {
+        if (n.key.value === "input") {
+          obj.type = "textInput";
+          obj.value = n.value.value;
+        } else {
+          console.error(n);
+          throw new Error();
+        }
+      });
+    }
+    metadataMap.set(obj, x);
+    return obj;
+  });
+  metadataMap.set(actions, node);
+  return actions;
 }
 
 class NoMatchedTypeError extends Error {
@@ -134,7 +177,12 @@ class NoMatchedTypeError extends Error {
   }
 }
 
-function normalizeOneOrMany<T>(x?: T | T[]): T[] {
-  if (!x) return [];
-  return Array.isArray(x) ? x : [x]
+function hasKey(node: YAMLNode, k: string) {
+  if (!node.mappings) return false;
+  return (node.mappings as any[]).map((v: { key: YAMLNode }) => v.key.value as string).some(key => key === k);
+}
+
+function normalizeOneOrMany(node: YAMLNode): YAMLNode[] {
+  if ((node as YAMLSequence).items) return (node as YAMLSequence).items as YAMLNode[];
+  return [node];
 }
