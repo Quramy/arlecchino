@@ -17,7 +17,8 @@ import {
 
 import { 
   restore,
-} from "../logger/restore";
+  getDefinition,
+} from "../logger/trace-functions";
 
 import {
   sleep,
@@ -54,15 +55,40 @@ export async function run(ctx: Context, rootModel: models.RootModel) {
     await acc;
     const conf = mergeConfiguration(rootModel.configuration, scenario.configuration);
     await ctx.preparePage({ conf, scenarioName: scenario.description });
-    await scenario.steps.reduce((acc, step) => acc.then(async () => {
-      const m = restore(step, ctx.metadata);
-      if (m) {
-        ctx.logger.log(m.fragment);
+    try {
+      await scenario.steps.reduce((acc, step) => acc.then(async () => {
+        ctx.logger.log(`execute ${step.type} step.`);
+        await nextStep(ctx.page, step);
+      }), Promise.resolve());
+    } catch (e) {
+      if (e instanceof NoElementFoundError) {
+        ctx.logger.log(`Can't find element: ${e.key}: ${e.val}`);
+        const traceMessage = e.traceMessage(ctx.metadata);
+        if (traceMessage) ctx.logger.log(traceMessage);
+        return;
       }
-      await nextStep(ctx.page, step);
-    }), Promise.resolve());
+      throw e;
+    }
   }, Promise.resolve());
   return;
+}
+
+export class NoElementFoundError extends Error {
+  constructor(
+    public readonly step: models.FindStep,
+    public readonly key: keyof models.FindStep,
+    public readonly val: string,
+  ) {
+    super();
+  }
+
+  traceMessage(metadata: Metadata) {
+    const m = this.step[this.key];
+    const def = getDefinition(m, metadata, 1);
+    if (!def) return;
+    return "Confirm the definition of this step:\n" + 
+      `${def.filename}:${def.postion.start.line + 1}:${def.postion.start.character + 1}` + "\n" + def.contents;
+  }
 }
 
 export class PageWrapper {
@@ -109,9 +135,10 @@ export class PageWrapper {
   }
 
   async find(step: models.FindStep) {
+    const query = this.evalString(step.query);
     const eh = await this.page.$(this.evalString(step.query));
     if (!eh) {
-      throw new Error('not found');
+      throw new NoElementFoundError(step, "query", query);
     }
     if (step.actions && step.actions.length) {
       await step.actions.reduce((acc, s) => acc.then(() => this.executeFindAction(s, eh)), Promise.resolve());
