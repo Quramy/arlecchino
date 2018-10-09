@@ -30,6 +30,7 @@ scenario:
         query: input[name='q']
         action:
           input: TypeScript
+    - sleep: 1000
     - screenshot
     - find:
         query: input[type='submit']

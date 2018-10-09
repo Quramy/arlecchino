@@ -17,6 +17,7 @@ export type Scenario = {
 
 export type Step = 
   GotoStep |
+  SleepStep |
   ScreenshotStep |
   WaitForNavigationStep |
   FindStep
@@ -24,6 +25,10 @@ export type Step =
 
 export type GotoStep = {
   goto: string,
+};
+
+export type SleepStep = {
+  sleep: number,
 };
 
 export type ScreenshotStep = "screenshot";

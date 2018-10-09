@@ -42,6 +42,8 @@ function nextStep(page: PageWrapper, step: models.Step) {
       return page.screenshot(step);
     case "waitForNavigation":
       return page.waitForNavigation(step);
+    case "sleep":
+      return page.sleep(step);
     default:
       throw new Error("");
   }
@@ -114,6 +116,10 @@ export class PageWrapper {
     if (step.actions && step.actions.length) {
       await step.actions.reduce((acc, s) => acc.then(() => this.executeFindAction(s, eh)), Promise.resolve());
     }
+  }
+
+  async sleep(step: models.SleepStep) {
+    await sleep(step.time);
   }
 
   // TODO refactor

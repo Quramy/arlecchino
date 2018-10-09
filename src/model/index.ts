@@ -15,10 +15,16 @@ export type Scenario = {
 
 export type Step =
   GotoStep |
+  SleepStep |
   ScreenshotStep |
   WaitForNavigationStep |
   FindStep
 ;
+
+export type SleepStep = {
+  type: "sleep",
+  time: number,
+};
 
 export interface GotoStep {
   readonly type: "goto";

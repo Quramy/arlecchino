@@ -90,7 +90,7 @@ function createConfigurationModel(node: YAMLNode, metadata: Metadata): model.Con
 }
 
 function createStepModels(node: YAMLSequence, metadata: Metadata): model.Step[] {
-  const ret: any[] = [];
+  const ret: model.Step[] = [];
   node.items.forEach(n => {
     if (isScreenshotStepNode(n)) {
       ret.push(createScreenshotStepModel(n, metadata));
@@ -100,6 +100,8 @@ function createStepModels(node: YAMLSequence, metadata: Metadata): model.Step[] 
       ret.push(createWaitForNavigationStepModel(n, metadata));
     } else if (isFindStepNode(n)) {
       ret.push(createFindStepModel(n, metadata));
+    } else if (isSleepStepNode(n)) {
+      ret.push(createSleepStep(n, metadata));
     }
   });
   return setMetadata(ret, metadata, node);
@@ -114,6 +116,16 @@ function createGotoStepModel(node: YAMLNode, metadata: Metadata): model.GotoStep
     urlFragment: createTemplateStringModel(node.mappings[0].value, metadata),
   } as any;
   return setMetadata(obj, metadata, node);
+}
+
+function isSleepStepNode(node: YAMLNode) {
+  return hasKey(node, "sleep");
+}
+function createSleepStep(node: YAMLNode, metadata: Metadata): model.SleepStep {
+  return setMetadata({
+    type: "sleep",
+    time: node.mappings[0].value.value,
+  } as model.SleepStep, metadata, node);
 }
 
 function isWaitForNavigationStepNode(node: YAMLNode) {
