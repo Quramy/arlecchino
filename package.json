@@ -1,7 +1,7 @@
 {
   "name": "arlecchino",
   "version": "0.0.1",
-  "description": "YAML based Puppeteer runner",
+  "description": "YAML based e2e runner",
   "bin": {
     "arlecchino": "built/cli.js"
   },
