@@ -6,6 +6,10 @@ import {
   ElementHandle,
 } from "puppeteer";
 
+import {
+  render as mustacheRender,
+} from "mustache";
+
 export interface Logger {
   log(...msg: string[]): any;
 }
@@ -58,6 +62,10 @@ export class PageWrapper {
     return this;
   }
 
+  private evalString(templateValue: models.TemplateString) {
+    return this.context.evaluateValue(templateValue);
+  }
+
   async screenshot(step: models.ScreenshotStep) {
   }
 
@@ -67,12 +75,13 @@ export class PageWrapper {
 
   async goto(step: models.GotoStep) {
     const { baseUri } = this.context.currentConfiguration;
-    const url = baseUri ? baseUri + "/" + step.urlFragment : step.urlFragment;
+    const fragment = this.evalString(step.urlFragment);
+    const url = baseUri ? this.evalString(baseUri) + "/" + fragment : fragment;
     await this.page.goto(url);
   }
 
   async find(step: models.FindStep) {
-    const eh = await this.page.$(step.query);
+    const eh = await this.page.$(this.evalString(step.query));
     if (!eh) {
       throw new Error('not found');
     }
@@ -85,7 +94,7 @@ export class PageWrapper {
     if (action.type === "click") {
       return await eh.click();
     } else if (action.type === "textInput") {
-      return await eh.type(action.value);
+      return await eh.type(this.evalString(action.value));
     }
   }
 }
@@ -114,6 +123,12 @@ export class Context {
     }
     this._currentConfiguration = conf;
     this._currentPage = await this._browser.newPage();
+  }
+
+  evaluateValue({ template }: { template: string }) {
+    return mustacheRender(template, {
+      $env: process.env,
+    });
   }
 
   get browser() {

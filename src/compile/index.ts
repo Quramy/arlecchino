@@ -63,11 +63,11 @@ function createScenarioModels(n: YAMLNode, metadataMap: MetadataMap): any {
   });
 }
 
-function createConfigurationModel(node: YAMLNode, metadataMap: Map<any, YAMLNode>): model.Configuration {
+function createConfigurationModel(node: YAMLNode, metadataMap: MetadataMap): model.Configuration {
   const obj: any = { };
   node.mappings.forEach((n: YAMLMapping) => {
     if (n.key.value === "base_uri") {
-      obj.baseUri = n.value.value;
+      obj.baseUri = createTemplateStringModel(n.value, metadataMap);
     } else {
       throw new Error("invalid key");
     }
@@ -98,7 +98,7 @@ function isGotoStepNode(node: YAMLNode) {
 function createGotoStepModel(node: YAMLNode, metadataMap: MetadataMap): model.GotoStep {
   const obj = {
     type: "goto",
-    urlFragment: node.mappings[0].value.value,
+    urlFragment: createTemplateStringModel(node.mappings[0].value, metadataMap),
   } as any;
   metadataMap.set(obj, node);
   return obj;
@@ -137,7 +137,7 @@ function createFindStepModel(node: YAMLNode, metadataMap: MetadataMap): model.Fi
   };
   node.mappings[0].value.mappings.forEach((n: YAMLMapping) => {
     if (n.key.value === "query") {
-      ret.query = n.value.value;
+      ret.query = createTemplateStringModel(n.value, metadataMap);
     } else if (n.key.value === "action") {
       ret.actions = createFindStepActionModels(n.value, metadataMap);
     } else if (n.key.value === "find") {
@@ -157,7 +157,7 @@ function createFindStepActionModels(node: YAMLNode, metadataMap: MetadataMap): m
       x.mappings.forEach((n: YAMLMapping) => {
         if (n.key.value === "input") {
           obj.type = "textInput";
-          obj.value = n.value.value;
+          obj.value = createTemplateStringModel(n.value, metadataMap);
         } else {
           console.error(n);
           throw new Error();
@@ -169,6 +169,14 @@ function createFindStepActionModels(node: YAMLNode, metadataMap: MetadataMap): m
   });
   metadataMap.set(actions, node);
   return actions;
+}
+
+function createTemplateStringModel(node: YAMLNode, metadataMap: MetadataMap): model.TemplateString {
+  const obj: model.TemplateString = {
+    template: node.value,
+  };
+  metadataMap.set(obj, node);
+  return obj;
 }
 
 class NoMatchedTypeError extends Error {

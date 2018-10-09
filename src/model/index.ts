@@ -4,7 +4,7 @@ export type RootModel = {
 };
 
 export type Configuration = {
-  baseUri?: string,
+  baseUri?: TemplateString,
 };
 
 export type Scenario = {
@@ -22,7 +22,7 @@ export type Step =
 
 export interface GotoStep {
   readonly type: "goto";
-  readonly urlFragment: string;
+  readonly urlFragment: TemplateString;
 }
 
 export type ScreenshotStep = {
@@ -37,7 +37,7 @@ export type WaitForNavigationStep = {
 
 export type FindStep = {
   type: "find",
-  query: string,
+  query: TemplateString,
   actions?: FindStepAction[],
   child?: FindStep,
 };
@@ -53,5 +53,9 @@ export type ClickAction = {
 
 export type TextInputAction = {
   type: "textInput",
-  value: string,
+  value: TemplateString,
 };
+
+export type TemplateString = {
+  template: string,
+}
