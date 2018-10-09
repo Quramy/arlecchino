@@ -1,15 +1,23 @@
 {
   "name": "arlecchino",
   "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
+  "description": "YAML based Puppeteer runner",
+  "bin": {
+    "arlecchino": "built/cli.js"
+  },
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "rimraf built && tsc"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["puppeteer", "yaml", "e2e"],
+  "author": "Quramy",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quramy/arlecchino.git"
+  },
+  "homepage": "https://github.com/Quramy/arlecchino",
   "devDependencies": {
     "@types/jest": "^23.3.4",
     "jest": "^23.6.0",
