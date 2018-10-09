@@ -15,6 +15,10 @@ import {
   DefaultResultWriter,
 } from "./result-writer";
 
+import {
+  sleep,
+} from "./util";
+
 export interface Logger {
   log(...msg: string[]): any;
 }
@@ -38,13 +42,14 @@ function nextStep(page: PageWrapper, step: models.Step) {
   }
 }
 
-export function run(ctx: Context, rootModel: models.RootModel) {
-  return rootModel.scenarios.reduce(async (acc, scenario) => {
+export async function run(ctx: Context, rootModel: models.RootModel) {
+  await rootModel.scenarios.reduce(async (acc, scenario) => {
     await acc;
     const conf = mergeConfiguration(rootModel.configuration, scenario.configuration);
     await ctx.preparePage({ conf, scenarioName: scenario.description });
     await scenario.steps.reduce((acc, step) => acc.then(() => nextStep(ctx.page, step)), Promise.resolve());
   }, Promise.resolve());
+  return;
 }
 
 export class PageWrapper {
@@ -125,16 +130,22 @@ class Counter {
   }
 }
 
+export type ContextCreateOptions = {
+  showBrowser?: boolean,
+};
+
 export class Context {
   readonly logger: Logger;
   readonly resultWriter: ResultWriter;
   readonly counter: Counter;
+  private readonly options: ContextCreateOptions;
   private _currentPage!: Page;
   private _browser!: Browser;
   private _page!: PageWrapper;
   private _currentConfiguration!: models.Configuration;
 
-  constructor() {
+  constructor(opt: ContextCreateOptions) {
+    this.options = opt;
     this.logger = {
       log: (...msg: string[]) => console.log.apply(console, msg),
     };
@@ -143,8 +154,17 @@ export class Context {
   }
 
   async init() {
-    this._browser = await launch({ headless: false });
+    this._browser = await launch({
+      headless: this.options.showBrowser,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     this._page = new PageWrapper(this);
+  }
+
+  async shutdown() {
+    await this._currentPage.close();
+    await sleep(100);
+    await this._browser.close();
   }
 
   async preparePage({ conf, scenarioName }: { conf: models.Configuration, scenarioName: string }) {
