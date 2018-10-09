@@ -15,15 +15,9 @@ import {
   DefaultResultWriter,
 } from "./result-writer";
 
-import { Logger, ConsoleLogger } from "../logger";
-import { 
-  restore,
-  getDefinition,
-} from "../logger/trace-functions";
-
-import {
-  sleep,
-} from "./util";
+import { Logger } from "../logger";
+import { getDefinition } from "../logger/trace-functions";
+import { sleep } from "./util";
 import { Metadata } from "../types/metadata";
 
 function mergeConfiguration(...configurations: models.Configuration[]): models.Configuration {
@@ -55,7 +49,7 @@ export async function run(ctx: Context, rootModel: models.RootModel) {
     ctx.logger.log(`Execute scenario: "${scenario.description}" .`);
     try {
       await scenario.steps.reduce((acc, step) => acc.then(async () => {
-        ctx.logger.debug(`execute ${step.type} step.`);
+        ctx.logger.debug(`Execute  - ${step.type} step.`);
         await nextStep(ctx.page, step);
       }), Promise.resolve());
     } catch (e) {
@@ -174,6 +168,7 @@ class Counter {
 }
 
 export type ContextCreateOptions = {
+  logger: Logger,
   showBrowser?: boolean,
   metadata: Metadata,
 };
@@ -191,7 +186,7 @@ export class Context {
 
   constructor(opt: ContextCreateOptions) {
     this.options = opt;
-    this.logger = new ConsoleLogger();
+    this.logger = opt.logger;
     this.counter = new Counter();
     this.resultWriter = new DefaultResultWriter();
     this.metadata = opt.metadata;

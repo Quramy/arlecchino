@@ -10,9 +10,12 @@ const cliOptions = yargs
   .wrap(120)
   .version(require("../package.json").version)
   .option("showBrowser", { boolean: true })
+  .option("verbose", { boolean: true, alias: "v" })
+  .option("quiet", { boolean: true, alias: "q" })
   .option("scenarioFile", { string: true, alias: "s" })
 
 const opt = {
+  logLevel: cliOptions.argv.verbose ? "verbose" : cliOptions.argv.quiet ? "silent" : "normal",
   showBrowser: cliOptions.argv.showBrowser,
   suiteFile: cliOptions.argv.scenarioFile,
 } as MainOption;
