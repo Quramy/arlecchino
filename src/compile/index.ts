@@ -34,23 +34,18 @@ export function compile(name: string) {
 function isSuiteSchema(node: YAMLNode) {
   return hasKey(node, "scenario");
 }
-function createRootModel(node: YAMLNode, metadata: Metadata) {
-  let m: any = { };
+function createRootModel(node: YAMLNode, metadata: Metadata): model.RootModel {
   if (isSuiteSchema(node)) {
-    node.mappings.forEach((n: YAMLMapping) => {
-      if (n.key.value === "configuration") {
-        m.configuration = createConfigurationModel(n.value, metadata);
-      } else if (n.key.value === "scenario") {
-        m.scenarios = createScenarioModels(n.value, metadata);
-      }
-    });
+    return setMetadata(mapWithMappingsNode<schema.Suite, model.RootModel>(node, {
+      configuration: ["configuration", (n: YAMLNode) => createConfigurationModel(n, metadata)],
+      scenario: ["scenarios", (n: YAMLNode) => createScenarioModels(n, metadata)],
+    }), metadata, node);
   } else {
-    m = {
+    return setMetadata({
       configuration: {},
       scenarios: createScenarioModels(node, metadata),
-    };
+    } as model.RootModel, metadata, node);
   }
-  return setMetadata(m, metadata, node);
 }
 
 function createScenarioModels(n: YAMLNode, metadata: Metadata): model.Scenario[] {
@@ -91,11 +86,10 @@ function isGotoStepNode(node: YAMLNode) {
   return hasKey(node, "goto");
 }
 function createGotoStepModel(node: YAMLNode, metadata: Metadata): model.GotoStep {
-  const obj = {
+  return setMetadata({
     type: "goto",
     urlFragment: createTemplateStringModel(node.mappings[0].value, metadata),
-  } as any;
-  return setMetadata(obj, metadata, node);
+  } as model.GotoStep, metadata, node);
 }
 
 function isSleepStepNode(node: YAMLNode) {
@@ -162,10 +156,4 @@ function createTemplateStringModel(node: YAMLNode, metadata: Metadata): model.Te
   return setMetadata({
     template: node.value,
   } as model.TemplateString, metadata, node);
-}
-
-class NoMatchedTypeError extends Error {
-  constructor(x: any) {
-    super(`${JSON.stringify(x)}`);
-  }
 }
