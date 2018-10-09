@@ -15,6 +15,7 @@ import {
   DefaultResultWriter,
 } from "./result-writer";
 
+import { Logger, ConsoleLogger } from "../logger";
 import { 
   restore,
   getDefinition,
@@ -24,10 +25,6 @@ import {
   sleep,
 } from "./util";
 import { Metadata } from "../types/metadata";
-
-export interface Logger {
-  log(...msg: string[]): any;
-}
 
 function mergeConfiguration(...configurations: models.Configuration[]): models.Configuration {
   return configurations.reduce((acc, conf) => ({ ...acc, ...conf }), { });
@@ -55,16 +52,17 @@ export async function run(ctx: Context, rootModel: models.RootModel) {
     await acc;
     const conf = mergeConfiguration(rootModel.configuration, scenario.configuration);
     await ctx.preparePage({ conf, scenarioName: scenario.description });
+    ctx.logger.log(`Execute scenario: "${scenario.description}" .`);
     try {
       await scenario.steps.reduce((acc, step) => acc.then(async () => {
-        ctx.logger.log(`execute ${step.type} step.`);
+        ctx.logger.debug(`execute ${step.type} step.`);
         await nextStep(ctx.page, step);
       }), Promise.resolve());
     } catch (e) {
       if (e instanceof NoElementFoundError) {
-        ctx.logger.log(`Can't find element: ${e.key}: ${e.val}`);
+        ctx.logger.error(`Can't find element: ${e.key}: ${e.val}`);
         const traceMessage = e.traceMessage(ctx.metadata);
-        if (traceMessage) ctx.logger.log(traceMessage);
+        if (traceMessage) ctx.logger.error(traceMessage);
         return;
       }
       throw e;
@@ -193,9 +191,7 @@ export class Context {
 
   constructor(opt: ContextCreateOptions) {
     this.options = opt;
-    this.logger = {
-      log: (...msg: string[]) => console.log.apply(console, msg),
-    };
+    this.logger = new ConsoleLogger();
     this.counter = new Counter();
     this.resultWriter = new DefaultResultWriter();
     this.metadata = opt.metadata;
