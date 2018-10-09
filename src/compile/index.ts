@@ -5,9 +5,15 @@ import {
   YAMLSequence,
   YAMLMapping,
 } from "yaml-ast-parser";
-// import * as schema from "../schema";
+import * as schema from "../schema";
 import * as model from "../model";
 import { Metadata } from "../types/metadata";
+import {
+  normalizeOneOrMany,
+  mapWithMappingsNode,
+  hasKey,
+  setMetadata,
+} from "./yaml-util";
 
 export function compile(name: string) {
   const txt = fs.readFileSync(name, "utf8");
@@ -23,17 +29,6 @@ export function compile(name: string) {
     rootModel,
     metadata,
   };
-}
-
-function setMetadata<T>(obj: T, metadata: Metadata, node: YAMLNode): T {
-  metadata.nodeMap.set(obj, {
-    filename: metadata.filename,
-    postion: {
-      start: node.startPosition,
-      end: node.endPosition,
-    },
-  });
-  return obj;
 }
 
 function isSuiteSchema(node: YAMLNode) {
@@ -58,35 +53,20 @@ function createRootModel(node: YAMLNode, metadata: Metadata) {
   return setMetadata(m, metadata, node);
 }
 
-function createScenarioModels(n: YAMLNode, metadata: Metadata): any {
+function createScenarioModels(n: YAMLNode, metadata: Metadata): model.Scenario[] {
   return normalizeOneOrMany(n).map(node => {
-    const obj: any = { };
-    node.mappings.forEach((n: YAMLMapping) => {
-      const key = n.key.value;
-      if (key === "configuration") {
-        obj.configuration = createConfigurationModel(n.value, metadata);
-      } else if (key === "description") {
-        obj.description = n.value.value;
-      } else if (key === "steps") {
-        obj.steps = createStepModels(n.value as YAMLSequence, metadata);
-      } else {
-        // obj[key] = visitNode(n.value);
-      }
-    });
-    return setMetadata(obj, metadata, node);
+    return setMetadata(mapWithMappingsNode<schema.Scenario, model.Scenario>(node, {
+      configuration: ["configuration", (n: YAMLNode) => createConfigurationModel(n, metadata)],
+      description: ["description", (n: YAMLNode) => n.value],
+      steps: ["steps", (n: YAMLNode) => createStepModels(n as YAMLSequence, metadata)],
+    }), metadata, node);
   });
 }
 
 function createConfigurationModel(node: YAMLNode, metadata: Metadata): model.Configuration {
-  const obj: any = { };
-  node.mappings.forEach((n: YAMLMapping) => {
-    if (n.key.value === "base_uri") {
-      obj.baseUri = createTemplateStringModel(n.value, metadata);
-    } else {
-      throw new Error("invalid key");
-    }
-  });
-  return setMetadata(obj, metadata, node);
+  return setMetadata(mapWithMappingsNode<schema.Configuration, model.Configuration>(node, {
+    base_uri: ["baseUri", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
+  }), metadata, node);
 }
 
 function createStepModels(node: YAMLSequence, metadata: Metadata): model.Step[] {
@@ -152,35 +132,25 @@ function isFindStepNode(node: YAMLNode) {
   return hasKey(node, "find");
 }
 function createFindStepModel(node: YAMLNode, metadata: Metadata): model.FindStep {
-  const ret: any = {
+  return setMetadata(mapWithMappingsNode<schema.FindStepBody, model.FindStep>(node.mappings[0].value, {
+    action: ["actions", (n: YAMLNode) => createFindStepActionModels(n, metadata)],
+    query: ["query", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
+    find: ["child", (n: YAMLNode) => createFindStepModel(n, metadata)],
+  }, {
     type: "find",
-  };
-  node.mappings[0].value.mappings.forEach((n: YAMLMapping) => {
-    if (n.key.value === "query") {
-      ret.query = createTemplateStringModel(n.value, metadata);
-    } else if (n.key.value === "action") {
-      ret.actions = createFindStepActionModels(n.value, metadata);
-    } else if (n.key.value === "find") {
-      ret.child = createFindStepModel(n.value.value, metadata);
-    }
-  });
-  return setMetadata(ret, metadata, node);
+  }), metadata, node);
 }
 
 function createFindStepActionModels(node: YAMLNode, metadata: Metadata): model.FindStepAction[] {
   const actions = normalizeOneOrMany(node).map(x => {
-    const obj = { } as any;
+    let obj: model.FindStepAction;
     if (x.value === "click") {
-      obj.type = "click";
+      obj = { type: "click" } as model.ClickAction;
     } else {
-      x.mappings.forEach((n: YAMLMapping) => {
-        if (n.key.value === "input") {
-          obj.type = "textInput";
-          obj.value = createTemplateStringModel(n.value, metadata);
-        } else {
-          console.error(n);
-          throw new Error();
-        }
+      obj = mapWithMappingsNode<schema.FindInputAction, model.TextInputAction>(x, {
+        input: ["value", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
+      }, {
+        type: "textInput",
       });
     }
     return setMetadata(obj, metadata, x);
@@ -198,14 +168,4 @@ class NoMatchedTypeError extends Error {
   constructor(x: any) {
     super(`${JSON.stringify(x)}`);
   }
-}
-
-function hasKey(node: YAMLNode, k: string) {
-  if (!node.mappings) return false;
-  return (node.mappings as any[]).map((v: { key: YAMLNode }) => v.key.value as string).some(key => key === k);
-}
-
-function normalizeOneOrMany(node: YAMLNode): YAMLNode[] {
-  if ((node as YAMLSequence).items) return (node as YAMLSequence).items as YAMLNode[];
-  return [node];
 }

@@ -11,7 +11,7 @@ export type Configuration = {
 
 export type Scenario = {
   description: string,
-  configuration?: Configuration,
+  configuration: Configuration,
   steps: Step[],
 };
 
@@ -36,11 +36,13 @@ export type ScreenshotStep = "screenshot";
 export type WaitForNavigationStep = "wait_for_navigation";
 
 export type FindStep = {
-  find: {
-    query: string,
-    action?: FindAction | FindAction[],
-    find?: FindStep,
-  }
+  find: FindStepBody,
+};
+
+export type FindStepBody = {
+  query: string,
+  action?: FindAction | FindAction[],
+  find?: FindStep,
 };
 
 export type FindAction =
