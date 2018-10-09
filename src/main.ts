@@ -8,11 +8,11 @@ export type MainOption = {
 
 export async function main(opt: MainOption) {
   const { suiteFile } = opt;
-  const { rootModel } = compile(suiteFile);
-  console.log(JSON.stringify(rootModel, null, 2));
-
+  const { rootModel, metadata } = compile(suiteFile);
+  // console.log(JSON.stringify(rootModel, null, 2));
   const ctx = new Context({
     showBrowser: opt.showBrowser,
+    metadata,
   });
   await ctx.init();
 

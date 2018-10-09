@@ -17,7 +17,7 @@ const opt = {
   suiteFile: cliOptions.argv.scenarioFile,
 } as MainOption;
 
-(require("./main").main(opt) as Promise<void>)
+(((require("./main") as typeof import("./main")).main)(opt) as Promise<void>)
 .then(() => process.exit(0))
 .catch(err => {
   console.error(err);
