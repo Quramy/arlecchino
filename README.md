@@ -1,3 +1,3 @@
-# Alrecchino
+# Arlecchino
 
 *T.B.D.*
