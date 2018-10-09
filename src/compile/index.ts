@@ -76,6 +76,8 @@ function createStepModels(node: YAMLSequence, metadata: Metadata): model.Step[] 
       return createFindStepModel(n, metadata);
     } else if (isSleepStepNode(n)) {
       return createSleepStep(n, metadata);
+    } else if (isStopStepNode(n)) {
+      return createStopStep(n, metadata);
     }
   }) as model.Step[], metadata, node);
 }
@@ -126,6 +128,7 @@ function isFindStepNode(node: YAMLNode) {
 function createFindStepModel(node: YAMLNode, metadata: Metadata): model.FindStep {
   return setMetadata(mapWithMappingsNode<schema.FindStepBody, model.FindStep>(node.mappings[0].value, {
     action: ["actions", (n: YAMLNode) => createFindStepActionModels(n, metadata)],
+    with_text: ["withText", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
     query: ["query", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
     find: ["child", (n: YAMLNode) => createFindStepModel(n, metadata)],
   }, {
@@ -147,6 +150,15 @@ function createFindStepActionModels(node: YAMLNode, metadata: Metadata): model.F
     }
     return setMetadata(obj, metadata, x);
   }) as model.FindStepAction[], metadata, node);
+}
+
+function isStopStepNode(node: YAMLNode) {
+  return node.value === "stop";
+}
+function createStopStep(node: YAMLNode, metadata: Metadata): model.StopStep {
+  return setMetadata({
+    type: "stop",
+  } as model.StopStep, metadata, node);
 }
 
 function createTemplateStringModel(node: YAMLNode, metadata: Metadata): model.TemplateString {

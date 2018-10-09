@@ -18,12 +18,17 @@ export type Step =
   SleepStep |
   ScreenshotStep |
   WaitForNavigationStep |
-  FindStep
+  FindStep |
+  StopStep
 ;
 
 export type SleepStep = {
   type: "sleep",
   time: number,
+};
+
+export type StopStep = {
+  type: "stop",
 };
 
 export interface GotoStep {
@@ -44,6 +49,7 @@ export type WaitForNavigationStep = {
 export type FindStep = {
   type: "find",
   query: TemplateString,
+  withText?: TemplateString,
   actions?: FindStepAction[],
   child?: FindStep,
 };

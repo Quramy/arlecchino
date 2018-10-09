@@ -20,7 +20,8 @@ export type Step =
   SleepStep |
   ScreenshotStep |
   WaitForNavigationStep |
-  FindStep
+  FindStep |
+  StopStep
 ;
 
 export type GotoStep = {
@@ -35,12 +36,15 @@ export type ScreenshotStep = "screenshot";
 
 export type WaitForNavigationStep = "wait_for_navigation";
 
+export type StopStep = "stop";
+
 export type FindStep = {
   find: FindStepBody,
 };
 
 export type FindStepBody = {
   query: string,
+  with_text?: string,
   action?: FindAction | FindAction[],
   find?: FindStep,
 };

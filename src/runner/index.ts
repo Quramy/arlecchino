@@ -36,6 +36,8 @@ function nextStep(page: PageWrapper, step: models.Step) {
       return page.waitForNavigation(step);
     case "sleep":
       return page.sleep(step);
+    case "stop":
+      return page.stop(step);
     default:
       throw new Error("");
   }
@@ -128,9 +130,22 @@ export class PageWrapper {
 
   async find(step: models.FindStep) {
     const query = this.evalString(step.query);
-    const eh = await this.page.$(this.evalString(step.query));
-    if (!eh) {
+    const ehList = await this.page.$$(this.evalString(step.query));
+    if (!ehList.length) {
       throw new NoElementFoundError(step, "query", query);
+    }
+    let eh: ElementHandle;
+    if (step.withText) {
+      const searchText = this.evalString(step.withText);
+      const textContents: { index: number, textContents: string | null }[] =
+        await this.context.currentPage.$$eval(query, (nodes: Element[]) => nodes.map((n, i) => ({ textContents: n.textContent, index: i })));
+      const hit = textContents.find(tc => !!tc.textContents && tc.textContents.includes(searchText));
+      if (!hit) {
+        throw new NoElementFoundError(step, "withText", searchText);
+      }
+      eh = ehList[hit.index];
+    } else {
+      eh = ehList[0];
     }
     if (step.actions && step.actions.length) {
       await step.actions.reduce((acc, s) => acc.then(() => this.executeFindAction(s, eh)), Promise.resolve());
@@ -139,6 +154,17 @@ export class PageWrapper {
 
   async sleep(step: models.SleepStep) {
     await sleep(step.time);
+  }
+
+  stop(step: models.StopStep) {
+    if (this.context.visible) {
+      this.context.logger.log(`Type "_resume_()" and enter key in Browser Developer Tool to resume steps.`);
+      return new Promise(res => {
+        this.context.currentPage.exposeFunction("_resume_", () => res());
+      });
+    } else {
+      return Promise.resolve();
+    }
   }
 
   // TODO refactor
@@ -221,6 +247,10 @@ export class Context {
     return mustacheRender(template, {
       $env: process.env,
     });
+  }
+
+  get visible() {
+    return this.options.showBrowser;
   }
 
   get browser() {
