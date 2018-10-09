@@ -10,6 +10,11 @@ import {
   render as mustacheRender,
 } from "mustache";
 
+import {
+  ResultWriter,
+  DefaultResultWriter,
+} from "./result-writer";
+
 export interface Logger {
   log(...msg: string[]): any;
 }
@@ -34,11 +39,11 @@ function nextStep(page: PageWrapper, step: models.Step) {
 }
 
 export function run(ctx: Context, rootModel: models.RootModel) {
-  return rootModel.scenarios.reduce(async (acc, s) => {
+  return rootModel.scenarios.reduce(async (acc, scenario) => {
     await acc;
-    const conf = mergeConfiguration(rootModel.configuration, s.configuration);
-    await ctx.preparePage(conf);
-    await s.steps.reduce((acc, step) => acc.then(() => nextStep(ctx.page, step)), Promise.resolve());
+    const conf = mergeConfiguration(rootModel.configuration, scenario.configuration);
+    await ctx.preparePage({ conf, scenarioName: scenario.description });
+    await scenario.steps.reduce((acc, step) => acc.then(() => nextStep(ctx.page, step)), Promise.resolve());
   }, Promise.resolve());
 }
 
@@ -67,6 +72,11 @@ export class PageWrapper {
   }
 
   async screenshot(step: models.ScreenshotStep) {
+    const buffer = await this.context.currentPage.screenshot({
+      fullPage: step.fullPage,
+    });
+    const fileName = "screenshot_" + this.context.counter.getAndIncrement() + ".png";
+    await this.context.resultWriter.writeBinary(buffer, fileName);
   }
 
   async waitForNavigation(step: models.WaitForNavigationStep) {
@@ -99,8 +109,26 @@ export class PageWrapper {
   }
 }
 
+class Counter {
+  private count = 0;
+
+  getAndIncrement() {
+    return ++this.count;
+  }
+
+  get() {
+    return this.count;
+  }
+
+  reset() {
+    this.count = 0;
+  }
+}
+
 export class Context {
   readonly logger: Logger;
+  readonly resultWriter: ResultWriter;
+  readonly counter: Counter;
   private _currentPage!: Page;
   private _browser!: Browser;
   private _page!: PageWrapper;
@@ -110,6 +138,8 @@ export class Context {
     this.logger = {
       log: (...msg: string[]) => console.log.apply(console, msg),
     };
+    this.counter = new Counter();
+    this.resultWriter = new DefaultResultWriter();
   }
 
   async init() {
@@ -117,10 +147,13 @@ export class Context {
     this._page = new PageWrapper(this);
   }
 
-  async preparePage(conf: models.Configuration) {
+  async preparePage({ conf, scenarioName }: { conf: models.Configuration, scenarioName: string }) {
     if (this._currentPage) {
       await this._currentPage.close();
     }
+    // TODO use out dir of cnofig
+    this.resultWriter.setPrefix("result/" + scenarioName.replace(/\s+/g, "_"));
+    this.counter.reset();
     this._currentConfiguration = conf;
     this._currentPage = await this._browser.newPage();
   }
