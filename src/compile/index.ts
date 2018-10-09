@@ -65,21 +65,19 @@ function createConfigurationModel(node: YAMLNode, metadata: Metadata): model.Con
 }
 
 function createStepModels(node: YAMLSequence, metadata: Metadata): model.Step[] {
-  const ret: model.Step[] = [];
-  node.items.forEach(n => {
+  return setMetadata(node.items.map(n => {
     if (isScreenshotStepNode(n)) {
-      ret.push(createScreenshotStepModel(n, metadata));
+      return createScreenshotStepModel(n, metadata);
     } else if (isGotoStepNode(n)) {
-      ret.push(createGotoStepModel(n, metadata));
+      return createGotoStepModel(n, metadata);
     } else if (isWaitForNavigationStepNode(n)) {
-      ret.push(createWaitForNavigationStepModel(n, metadata));
+      return createWaitForNavigationStepModel(n, metadata);
     } else if (isFindStepNode(n)) {
-      ret.push(createFindStepModel(n, metadata));
+      return createFindStepModel(n, metadata);
     } else if (isSleepStepNode(n)) {
-      ret.push(createSleepStep(n, metadata));
+      return createSleepStep(n, metadata);
     }
-  });
-  return setMetadata(ret, metadata, node);
+  }) as model.Step[], metadata, node);
 }
 
 function isGotoStepNode(node: YAMLNode) {
@@ -136,7 +134,7 @@ function createFindStepModel(node: YAMLNode, metadata: Metadata): model.FindStep
 }
 
 function createFindStepActionModels(node: YAMLNode, metadata: Metadata): model.FindStepAction[] {
-  const actions = normalizeOneOrMany(node).map(x => {
+  return setMetadata(normalizeOneOrMany(node).map(x => {
     let obj: model.FindStepAction;
     if (x.value === "click") {
       obj = { type: "click" } as model.ClickAction;
@@ -148,8 +146,7 @@ function createFindStepActionModels(node: YAMLNode, metadata: Metadata): model.F
       });
     }
     return setMetadata(obj, metadata, x);
-  });
-  return setMetadata(actions, metadata, node);
+  }) as model.FindStepAction[], metadata, node);
 }
 
 function createTemplateStringModel(node: YAMLNode, metadata: Metadata): model.TemplateString {
