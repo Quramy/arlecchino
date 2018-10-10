@@ -258,8 +258,12 @@ export class Context {
       width: 960,
       height: 600,
     };
-    const vp = { ...defaultViewport, ...conf.viewport!.value || { } };
-    await this._currentPage.setViewport(vp);
+    if (conf.viewport && conf.viewport.value) {
+      const vp = { ...defaultViewport, ...conf.viewport.value || { } };
+      await this._currentPage.setViewport(vp);
+    } else {
+      await this._currentPage.setViewport(defaultViewport);
+    }
   }
 
   evaluateValue({ template }: { template: string }) {
