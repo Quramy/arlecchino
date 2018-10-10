@@ -16,12 +16,21 @@ import {
 } from "./result-writer";
 
 import { Logger } from "../logger";
-import { getDefinition } from "../logger/trace-functions";
+import { getDefinitionFromModel } from "../logger/trace-functions";
 import { sleep } from "./util";
 import { Metadata } from "../types/metadata";
 
 function mergeConfiguration(...configurations: models.Configuration[]): models.Configuration {
-  return configurations.reduce((acc, conf) => ({ ...acc, ...conf }), { });
+  return configurations.reduce((acc, conf) => {
+    return {
+      ...acc,
+      ...conf,
+      includedVariables: {
+        ...acc.includedVariables,
+        ...conf.includedVariables,
+      },
+    };
+  }, { });
 }
 
 function nextStep(page: PageWrapper, step: models.Step) {
@@ -78,7 +87,7 @@ export class NoElementFoundError extends Error {
 
   traceMessage(metadata: Metadata) {
     const m = this.step[this.key];
-    const def = getDefinition(m, metadata, 1);
+    const def = getDefinitionFromModel(m, metadata, 1);
     if (!def) return;
     return "Confirm the definition of this step:\n" + 
       `${def.filename}:${def.postion.start.line + 1}:${def.postion.start.character + 1}` + "\n" + def.contents;
@@ -244,7 +253,10 @@ export class Context {
   }
 
   evaluateValue({ template }: { template: string }) {
+    // TODO should be support to replacement for the included variables?
+    const variables = { ...this.currentConfiguration.includedVariables };
     return mustacheRender(template, {
+      ...variables,
       $env: process.env,
     });
   }

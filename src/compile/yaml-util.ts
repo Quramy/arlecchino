@@ -3,7 +3,7 @@ import {
   YAMLMapping,
   YAMLSequence,
 } from "yaml-ast-parser";
-import { Metadata } from "../types/metadata";
+import { MetadataInCompilation } from "./types";
 
 export type MappingDefinition<S, T, K extends keyof T> = {
   [P in keyof S]: [K, (node: YAMLNode) => T[K]];
@@ -39,9 +39,9 @@ export function normalizeOneOrMany(node: YAMLNode): YAMLNode[] {
   return [node];
 }
 
-export function setMetadata<T>(obj: T, metadata: Metadata, node: YAMLNode): T {
+export function setMetadata<T>(obj: T, metadata: MetadataInCompilation, node: YAMLNode): T {
   metadata.nodeMap.set(obj, {
-    filename: metadata.filename,
+    filename: metadata.currentFilename,
     postion: {
       start: node.startPosition,
       end: node.endPosition,

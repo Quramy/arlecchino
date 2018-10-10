@@ -1,4 +1,8 @@
 import fs from "fs";
+import path from "path";
+import {
+  load as parseYaml,
+} from "js-yaml";
 import {
   load as loadYaml,
   YAMLNode,
@@ -7,28 +11,46 @@ import {
 } from "yaml-ast-parser";
 import * as schema from "../schema";
 import * as model from "../model";
-import { Metadata } from "../types/metadata";
+import { MetadataInCompilation as Metadata } from "./types";
 import {
   normalizeOneOrMany,
   mapWithMappingsNode,
   hasKey,
   setMetadata,
 } from "./yaml-util";
+import {
+  CompileError,
+  IncludeFileNotFoundError,
+  NoSupportedIncludeVariablesFormatError,
+} from "./errors";
+import { Logger } from "../logger";
 
-export function compile(name: string) {
+export function compile(name: string, logger: Logger) {
   const txt = fs.readFileSync(name, "utf8");
   const fileMap = new Map();
   fileMap.set(name, txt);
   const metadata = {
-    filename: name,
+    currentFilename: name,
     fileMap,
     nodeMap: new Map(),
   } as Metadata;
-  const rootModel = createRootModel(loadYaml(txt), metadata);
-  return {
-    rootModel,
-    metadata,
-  };
+  try {
+    const rootModel = createRootModel(loadYaml(txt), metadata);
+    return {
+      rootModel,
+      metadata,
+    };
+  } catch (e) {
+    if (e instanceof CompileError) {
+      const def = e.definition(metadata);
+      logger.error(e.shortMessage());
+      if (def) {
+        logger.error(def);
+      }
+      return;
+    }
+    throw e;
+  }
 }
 
 function isSuiteSchema(node: YAMLNode) {
@@ -61,7 +83,36 @@ function createScenarioModels(n: YAMLNode, metadata: Metadata): model.Scenario[]
 function createConfigurationModel(node: YAMLNode, metadata: Metadata): model.Configuration {
   return setMetadata(mapWithMappingsNode<schema.Configuration, model.Configuration>(node, {
     base_uri: ["baseUri", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
+    include_var: ["includedVariables", (n: YAMLNode) => createIncludedVariables(n, metadata)],
   }), metadata, node);
+}
+
+function createIncludedVariables(node: YAMLNode, metadata: Metadata) {
+  return normalizeOneOrMany(node).map(n => {
+    if (typeof n.value !== "string") {
+      // TODO
+      throw new Error();
+    }
+    const nameToBeIncluded = path.resolve(path.dirname(metadata.currentFilename), n.value);
+    if (!fs.existsSync(nameToBeIncluded)) {
+      throw new IncludeFileNotFoundError(n, nameToBeIncluded);
+    }
+    let contents: string;
+    contents = fs.readFileSync(nameToBeIncluded, "utf8");
+    metadata.fileMap.set(nameToBeIncluded, contents);
+    let variableObject;
+    try {
+      variableObject = JSON.parse(contents);
+    } catch (e) {
+      // nothing to do
+    }
+    try {
+      variableObject = parseYaml(contents);
+    } catch (e) {
+      throw new NoSupportedIncludeVariablesFormatError(n);
+    }
+    return variableObject;
+  }).reduce((acc, vars) => ({ ...acc, ...vars }), { });
 }
 
 function createStepModels(node: YAMLSequence, metadata: Metadata): model.Step[] {

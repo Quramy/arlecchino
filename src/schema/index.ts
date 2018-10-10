@@ -7,7 +7,10 @@ export type Suite = {
 
 export type Configuration = {
   base_uri?: string,
+  include_var: IncludeVar,
 };
+
+export type IncludeVar = string | string[];
 
 export type Scenario = {
   description: string,

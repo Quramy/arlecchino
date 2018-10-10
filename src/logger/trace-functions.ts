@@ -1,5 +1,6 @@
 import {
   Metadata,
+  MetadataMapRecord,
 } from "../types/metadata";
 
 export type Range = {
@@ -19,9 +20,7 @@ export function restore(model: any, metadata: Metadata) {
   };
 }
 
-export function getDefinition(model: any, metadata: Metadata, arround = 0) {
-  const node = metadata.nodeMap.get(model);
-  if (!node) return;
+export function getDefinionFromRecord(node: MetadataMapRecord, metadata: Metadata, arround = 0) {
   const file = metadata.fileMap.get(node.filename);
   if (!file) return;
   const lines = toLines(file);
@@ -36,6 +35,12 @@ export function getDefinition(model: any, metadata: Metadata, arround = 0) {
     },
     contents: lines.slice(start, end).join("\n"),
   };
+}
+
+export function getDefinitionFromModel(model: any, metadata: Metadata, arround = 0) {
+  const node = metadata.nodeMap.get(model);
+  if (!node) return;
+  return getDefinionFromRecord(node, metadata, arround);
 }
 
 export function toLines(contents: string) {

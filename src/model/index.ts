@@ -5,6 +5,7 @@ export type RootModel = {
 
 export type Configuration = {
   baseUri?: TemplateString,
+  includedVariables?: any,
 };
 
 export type Scenario = {

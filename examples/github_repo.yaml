@@ -1,12 +1,21 @@
 description: Find with text content
 configuration:
   base_uri: https://github.com/Quramy
+  include_var: var.yml
 steps:
-  - goto: arlecchino
+  - goto: "/{{ repo }}"
   - sleep: 100
+  - screenshot
+  - find:
+      query: button[type='submit']
+      with_text: Dismiss
+      action: click
+  - sleep: 300
+  - screenshot
   - find:
       query: h1
-      with_text: Arlecchino
+      with_text: "{{ section }}"
   - find:
       query: h2
       with_text: License
+  - stop

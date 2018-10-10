@@ -10,7 +10,11 @@
     "test": "jest",
     "prepare": "rimraf built && tsc"
   },
-  "keywords": ["puppeteer", "yaml", "e2e"],
+  "keywords": [
+    "puppeteer",
+    "yaml",
+    "e2e"
+  ],
   "author": "Quramy",
   "license": "MIT",
   "repository": {
@@ -25,11 +29,13 @@
     "typescript": "^3.1.1"
   },
   "dependencies": {
+    "@types/js-yaml": "^3.11.2",
     "@types/mkdirp": "^0.5.2",
     "@types/mustache": "^0.8.31",
     "@types/puppeteer": "^1.8.0",
     "@types/rimraf": "^2.0.2",
     "@types/yargs": "^12.0.1",
+    "js-yaml": "^3.12.0",
     "mkdirp": "^0.5.1",
     "mustache": "^3.0.0",
     "puppeteer": "^1.8.0",

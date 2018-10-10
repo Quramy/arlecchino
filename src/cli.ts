@@ -20,10 +20,16 @@ const opt = {
   suiteFile: cliOptions.argv.scenarioFile,
 } as MainOption;
 
-(((require("./main") as typeof import("./main")).main)(opt) as Promise<void>)
-.then(() => process.exit(0))
+((require("./main") as typeof import("./main")).main)(opt)
+.then((ret) => {
+  if (!ret) {
+    process.exit(1);
+  } else {
+    process.exit(0);
+  }
+})
 .catch(err => {
   console.error(err);
-  process.exit(1);
+  process.exit(2);
 });
 
