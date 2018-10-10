@@ -84,6 +84,7 @@ function createConfigurationModel(node: YAMLNode, metadata: Metadata): model.Con
   return setMetadata(mapWithMappingsNode<schema.Configuration, model.Configuration>(node, {
     base_uri: ["baseUri", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
     include_var: ["includedVariables", (n: YAMLNode) => createIncludedVariables(n, metadata)],
+    viewport: ["viewport", (n: YAMLNode) => createViewportModel(n, metadata)],
   }), metadata, node);
 }
 
@@ -113,6 +114,26 @@ function createIncludedVariables(node: YAMLNode, metadata: Metadata) {
     }
     return variableObject;
   }).reduce((acc, vars) => ({ ...acc, ...vars }), { });
+}
+
+function createViewportModel(node: YAMLNode, metadata: Metadata): model.Viewport {
+  if (typeof node.value === "string") {
+    return setMetadata({
+      name: createTemplateStringModel(node, metadata),
+    } as model.Viewport, metadata, node);
+  } else {
+    const vpObj = mapWithMappingsNode<schema.ViewportObject, model.ViewportObject>(node, {
+      "width": ["width", (n: YAMLNode) => n.valueObject],
+      "height": ["height", (n: YAMLNode) => n.valueObject],
+      "device_scale_factor": ["deviceScaleFactor", (n: YAMLNode) => n.valueObject],
+      "has_touch": ["deviceScaleFactor", (n: YAMLNode) => n.valueObject],
+      "is_mobile": ["isMobile", (n: YAMLNode) => n.valueObject],
+      "is_landscape": ["isLandscape", (n: YAMLNode) => n.valueObject],
+    });
+    return setMetadata({
+      value: vpObj,
+    } as model.Viewport, metadata, node);
+  }
 }
 
 function createStepModels(node: YAMLSequence, metadata: Metadata): model.Step[] {

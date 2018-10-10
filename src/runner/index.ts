@@ -25,6 +25,10 @@ function mergeConfiguration(...configurations: models.Configuration[]): models.C
     return {
       ...acc,
       ...conf,
+      viewport: {
+        ...acc.viewport,
+        ...conf.viewport,
+      },
       includedVariables: {
         ...acc.includedVariables,
         ...conf.includedVariables,
@@ -250,6 +254,12 @@ export class Context {
     this.counter.reset();
     this._currentConfiguration = conf;
     this._currentPage = await this._browser.newPage();
+    const defaultViewport = {
+      width: 960,
+      height: 600,
+    };
+    const vp = { ...defaultViewport, ...conf.viewport!.value || { } };
+    await this._currentPage.setViewport(vp);
   }
 
   evaluateValue({ template }: { template: string }) {

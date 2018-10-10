@@ -7,10 +7,21 @@ export type Suite = {
 
 export type Configuration = {
   base_uri?: string,
+  viewport?: ViewportObject,
   include_var: IncludeVar,
 };
 
 export type IncludeVar = string | string[];
+
+export type Viewport = "string" | ViewportObject;
+export type ViewportObject = {
+  width?: number,
+  height?: number,
+  device_scale_factor?: number,
+  is_mobile?: boolean,
+  has_touch?: boolean,
+  is_landscape?: boolean,
+};
 
 export type Scenario = {
   description: string,

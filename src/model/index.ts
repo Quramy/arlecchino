@@ -6,6 +6,21 @@ export type RootModel = {
 export type Configuration = {
   baseUri?: TemplateString,
   includedVariables?: any,
+  viewport?: Viewport,
+};
+
+export type Viewport = {
+  name?: TemplateString,
+  value?: ViewportObject,
+}
+
+export type ViewportObject = {
+  width?: number,
+  height?: number,
+  deviceScaleFactor?: number,
+  isMobile?: boolean,
+  hasTouch?: boolean,
+  isLandscape?: boolean,
 };
 
 export type Scenario = {
