@@ -1,4 +1,4 @@
-import { YAMLNode } from "yaml-ast-parser";
+import { YAMLNode, YamlMap as YAMLMap, YAMLMapping } from "yaml-ast-parser";
 import { MetadataInCompilation as Metadata } from "./types";
 import { getDefinionFromRecord } from "../logger/trace-functions";
 
@@ -47,12 +47,22 @@ export class NoSupportedIncludeVariablesFormatError extends CompileError {
 }
 
 export class NoRequiredValueError extends CompileError {
-  constructor(node: YAMLNode) {
+  constructor(node: YAMLMapping) {
     super(node.parent || node);
   }
 
   shortMessage() {
     return `This field is requierd.`;
+  }
+}
+
+export class RequiredKeyNotExistError extends CompileError {
+  constructor(node: YAMLMap, private readonly missingKeys: string[]) {
+    super(node);
+  }
+
+  shortMessage() {
+    return `Some keys are required. Missing keys are ${this.missingKeys.map(k => "'" + k + "'").join(", ")}`;
   }
 }
 

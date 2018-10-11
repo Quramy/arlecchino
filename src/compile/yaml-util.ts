@@ -5,20 +5,30 @@ import {
   YAMLSequence,
 } from "yaml-ast-parser";
 import { MetadataInCompilation, YAMLNumberValueNode } from "./types";
-import { NotAllowedValueTypeError, NoRequiredValueError, NotAllowedKeyError } from "./errors";
+import { NotAllowedValueTypeError, NoRequiredValueError, NotAllowedKeyError, RequiredKeyNotExistError } from "./errors";
 
-export type MappingDefinition<S, T, K extends keyof T> = {
-  [P in keyof S]: [K, (node: YAMLNode) => T[K]];
+export type MappingDefinitionOptions<T> = {
+  requiredKeys?: (keyof T)[],
 };
 
-export function mapWithMappingsNode<T, S>(node: YAMLNode, map: MappingDefinition<T, S, keyof S>, additional?: Partial<S>): S {
+export type MappingDefinition<T, S, K extends keyof S> = {
+  [P in keyof T]: [K, (node: YAMLNode) => S[K]];
+};
+
+export function mapWithMappingsNode<T, S>(node: YAMLNode, map: MappingDefinition<T, S, keyof S>, additional?: Partial<S>, opt?: MappingDefinitionOptions<T>): S {
   const def = map as any;
   if (!node.mappings) {
     throw new NotAllowedValueTypeError(node, "mapping");
   }
   const ret = { } as any;
+  const missingKeys = new Set<string>(opt && opt.requiredKeys ? opt.requiredKeys as string[] : []);
+  const requiredKeys = new Set<string>(opt && opt.requiredKeys ? opt.requiredKeys as string[] : []);
   node.mappings.forEach((n: YAMLMapping) => {
     const key = n.key.value;
+    missingKeys.delete(key);
+    if (requiredKeys.has(key)) {
+      withValidateNonNullMaping(n);
+    }
     const wrap = def[key];
     if (!wrap) {
       throw new NotAllowedKeyError(n.key, key, Object.keys(def));
@@ -26,6 +36,9 @@ export function mapWithMappingsNode<T, S>(node: YAMLNode, map: MappingDefinition
     const [name, fn] = wrap;
     ret[name] = fn(n.value);
   });
+  if (missingKeys.size !== 0) {
+    throw new RequiredKeyNotExistError(node as YAMLMap, Array.from(missingKeys.values()));
+  }
   if (!additional) return ret as S;
   return Object.assign(ret, additional) as S;
 }
@@ -40,7 +53,14 @@ export function normalizeOneOrMany(node: YAMLNode): YAMLNode[] {
   return [node];
 }
 
-export function withValidateNonNullValueType(node: YAMLNode) {
+export function withValidateMappingType(node: YAMLNode) {
+  if (node && node.mappings) {
+    return node as YAMLMap;
+  }
+  throw new NotAllowedValueTypeError(node, "mapping");
+}
+
+export function withValidateNonNullMaping(node: YAMLMapping) {
   if (node && node.value) {
     return node;
   }
