@@ -49,7 +49,7 @@ function nextStep(page: PageWrapper, step: models.Step) {
       return page.waitForNavigation(step);
     case "sleep":
       return page.sleep(step);
-    case "stop":
+    case "pause":
       return page.stop(step);
     default:
       throw new Error("");
@@ -169,7 +169,7 @@ export class PageWrapper {
     await sleep(step.time);
   }
 
-  stop(step: models.StopStep) {
+  stop(step: models.PauseModel) {
     if (this.context.visible) {
       this.context.logger.log(`Type "_resume_()" and enter key in Browser Developer Tool to resume steps.`);
       return new Promise(res => {

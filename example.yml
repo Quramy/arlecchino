@@ -30,6 +30,7 @@ steps:
         input: TypeScript
   - sleep: 300
   - screenshot
+  - pause
   - find:
       query: input[type='submit']
       action: click

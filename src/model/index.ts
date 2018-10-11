@@ -35,7 +35,7 @@ export type Step =
   ScreenshotStep |
   WaitForNavigationStep |
   FindStep |
-  StopStep
+  PauseModel
 ;
 
 export type SleepStep = {
@@ -43,8 +43,8 @@ export type SleepStep = {
   time: number,
 };
 
-export type StopStep = {
-  type: "stop",
+export type PauseModel = {
+  type: "pause",
 };
 
 export interface GotoStep {

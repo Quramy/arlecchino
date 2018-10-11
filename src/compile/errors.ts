@@ -46,6 +46,16 @@ export class NoSupportedIncludeVariablesFormatError extends CompileError {
   }
 }
 
+export class NoRequiredValueError extends CompileError {
+  constructor(node: YAMLNode) {
+    super(node.parent || node);
+  }
+
+  shortMessage() {
+    return `This field is requierd.`;
+  }
+}
+
 export class NotAllowedValueTypeError extends CompileError {
 
   constructor(node: YAMLNode, private readonly type: string) {

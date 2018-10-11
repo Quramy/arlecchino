@@ -1,9 +1,10 @@
 import assert from "assert";
 import { load } from "yaml-ast-parser";
-import { createTemplateStringModel } from "./template-string";
 import { MetadataInCompilation } from "../types";
-import { NotAllowedValueTypeError } from "../errors";
 import { dummyMetadata } from "../testing";
+
+import { createTemplateStringModel } from "./template-string";
+import { NotAllowedValueTypeError } from "../errors";
 
 describe("createTemplateStringModel", () => {
   it("should throw compile error when value type is not string", () => {

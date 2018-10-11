@@ -1,0 +1,15 @@
+import { YAMLNode, YamlMap as YAMLMap } from "yaml-ast-parser";
+import * as models from "../../model";
+import { MetadataInCompilation as Metadata } from "../types";
+import { setMetadata, hasKey, withValidateNumberType } from "../yaml-util";
+
+export function isSleepStepNode(node: YAMLNode): node is YAMLMap {
+  return hasKey(node, "sleep");
+}
+
+export function createSleepStep(node: YAMLMap, metadata: Metadata): models.SleepStep {
+  return setMetadata({
+    type: "sleep",
+    time: withValidateNumberType(node.mappings[0].value).valueObject,
+  } as models.SleepStep, metadata, node);
+}

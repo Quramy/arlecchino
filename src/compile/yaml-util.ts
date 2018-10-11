@@ -1,9 +1,11 @@
 import {
   YAMLNode,
+  YamlMap as YAMLMap,
   YAMLMapping,
   YAMLSequence,
 } from "yaml-ast-parser";
-import { MetadataInCompilation } from "./types";
+import { MetadataInCompilation, YAMLNumberValueNode } from "./types";
+import { NotAllowedValueTypeError, NoRequiredValueError } from "./errors";
 
 export type MappingDefinition<S, T, K extends keyof T> = {
   [P in keyof S]: [K, (node: YAMLNode) => T[K]];
@@ -29,7 +31,7 @@ export function mapWithMappingsNode<T, S>(node: YAMLNode, map: MappingDefinition
   return Object.assign(ret, additional) as S;
 }
 
-export function hasKey(node: YAMLNode, k: string) {
+export function hasKey(node: YAMLNode, k: string): node is YAMLMap {
   if (!node.mappings) return false;
   return (node.mappings as any[]).map((v: { key: YAMLNode }) => v.key.value as string).some(key => key === k);
 }
@@ -37,6 +39,20 @@ export function hasKey(node: YAMLNode, k: string) {
 export function normalizeOneOrMany(node: YAMLNode): YAMLNode[] {
   if ((node as YAMLSequence).items) return (node as YAMLSequence).items as YAMLNode[];
   return [node];
+}
+
+export function withValidateNonNullValueType(node: YAMLNode) {
+  if (node && node.value) {
+    return node;
+  }
+  throw new NoRequiredValueError(node);
+}
+
+export function withValidateNumberType(node: YAMLNode) {
+  if ("valueObject" in node && typeof node.valueObject === "number") {
+    return node as YAMLNumberValueNode;
+  }
+  throw new NotAllowedValueTypeError(node, "number");
 }
 
 export function setMetadata<T>(obj: T, metadata: MetadataInCompilation, node: YAMLNode): T {

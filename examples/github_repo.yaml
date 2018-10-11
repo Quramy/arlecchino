@@ -22,4 +22,4 @@ steps:
   - find:
       query: h2
       with_text: License
-  - stop
+  - pause

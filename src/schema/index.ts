@@ -35,7 +35,7 @@ export type Step =
   ScreenshotStep |
   WaitForNavigationStep |
   FindStep |
-  StopStep
+  PauseStep
 ;
 
 export type GotoStep = {
@@ -50,7 +50,7 @@ export type ScreenshotStep = "screenshot";
 
 export type WaitForNavigationStep = "wait_for_navigation";
 
-export type StopStep = "stop";
+export type PauseStep = "pause";
 
 export type FindStep = {
   find: FindStepBody,
