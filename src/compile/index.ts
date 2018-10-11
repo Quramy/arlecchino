@@ -13,10 +13,10 @@ export function compileFromFile(filename: string, logger: Logger) {
 
 export function compileFromText(textContent: string, filename: string, logger: Logger) {
   const fileMap = new Map();
-  fileMap.set(name, textContent);
+  fileMap.set(filename, textContent);
 
   const metadata = {
-    currentFilename: name,
+    currentFilename: filename,
     fileMap,
     nodeMap: new Map(),
   } as Metadata;

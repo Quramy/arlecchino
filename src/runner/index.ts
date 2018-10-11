@@ -16,9 +16,9 @@ import {
 } from "./result-writer";
 
 import { Logger } from "../logger";
-import { getDefinitionFromModel } from "../logger/trace-functions";
 import { sleep } from "./util";
 import { Metadata } from "../types/metadata";
+import { NoElementFoundError } from "./errors";
 
 function mergeConfiguration(...configurations: models.Configuration[]): models.Configuration {
   return configurations.reduce((acc, conf) => {
@@ -37,7 +37,7 @@ function mergeConfiguration(...configurations: models.Configuration[]): models.C
   }, { });
 }
 
-function nextStep(page: PageWrapper, step: models.Step) {
+function nextStep(page: StepExecutor, step: models.Step) {
   switch (step.type) {
     case "find":
       return page.find(step);
@@ -65,7 +65,7 @@ export async function run(ctx: Context, rootModel: models.RootModel) {
     try {
       await scenario.steps.reduce((acc, step) => acc.then(async () => {
         ctx.logger.debug(`Execute  - ${step.type} step.`);
-        await nextStep(ctx.page, step);
+        await nextStep(ctx.stepExecutor, step);
       }), Promise.resolve());
     } catch (e) {
       if (e instanceof NoElementFoundError) {
@@ -80,25 +80,7 @@ export async function run(ctx: Context, rootModel: models.RootModel) {
   return;
 }
 
-export class NoElementFoundError extends Error {
-  constructor(
-    public readonly step: models.FindStep,
-    public readonly key: keyof models.FindStep,
-    public readonly val: string,
-  ) {
-    super();
-  }
-
-  traceMessage(metadata: Metadata) {
-    const m = this.step[this.key];
-    const def = getDefinitionFromModel(m, metadata, 1);
-    if (!def) return;
-    return "Confirm the definition of this step:\n" + 
-      `${def.filename}:${def.postion.start.line + 1}:${def.postion.start.character + 1}` + "\n" + def.contents;
-  }
-}
-
-export class PageWrapper {
+export class StepExecutor {
 
   private readonly context: Context;
 
@@ -114,10 +96,6 @@ export class PageWrapper {
     return this.page.url();
   }
 
-  private async next(step: models.Step) {
-    return this;
-  }
-
   private evalString(templateValue: models.TemplateString) {
     return this.context.evaluateValue(templateValue);
   }
@@ -126,7 +104,7 @@ export class PageWrapper {
     const buffer = await this.context.currentPage.screenshot({
       fullPage: step.fullPage,
     });
-    const fileName = "screenshot_" + this.context.counter.getAndIncrement() + ".png";
+    const fileName = "screenshot_" + this.context.counters.screenshot.getAndIncrement() + ".png";
     await this.context.resultWriter.writeBinary(buffer, fileName);
   }
 
@@ -215,18 +193,18 @@ export type ContextCreateOptions = {
 export class Context {
   readonly logger: Logger;
   readonly resultWriter: ResultWriter;
-  readonly counter: Counter;
+  readonly counters: { screenshot: Counter };
   readonly metadata: Metadata;
   private readonly options: ContextCreateOptions;
   private _currentPage!: Page;
   private _browser!: Browser;
-  private _page!: PageWrapper;
+  private _stepExecutor!: StepExecutor;
   private _currentConfiguration!: models.Configuration;
 
   constructor(opt: ContextCreateOptions) {
     this.options = opt;
     this.logger = opt.logger;
-    this.counter = new Counter();
+    this.counters = { screenshot: new Counter() };
     this.resultWriter = new DefaultResultWriter();
     this.metadata = opt.metadata;
   }
@@ -236,7 +214,7 @@ export class Context {
       headless: !this.options.showBrowser,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
-    this._page = new PageWrapper(this);
+    this._stepExecutor = new StepExecutor(this);
   }
 
   async shutdown() {
@@ -251,9 +229,11 @@ export class Context {
     }
     // TODO use out dir of cnofig
     this.resultWriter.setPrefix("result/" + scenarioName.replace(/\s+/g, "_"));
-    this.counter.reset();
+    this.counters.screenshot.reset();
     this._currentConfiguration = conf;
     this._currentPage = await this._browser.newPage();
+
+    // TODO extract function
     const defaultViewport = {
       width: 960,
       height: 600,
@@ -291,7 +271,7 @@ export class Context {
     return this._currentConfiguration;
   }
 
-  get page() {
-    return this._page;
+  get stepExecutor() {
+    return this._stepExecutor;
   }
 }
