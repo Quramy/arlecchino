@@ -6,9 +6,9 @@ import { Logger } from "../logger";
 import { CompileError } from "./errors";
 import { createRootModel } from "./traverser/suite";
 
-export function compileFromFile(name: string, logger: Logger) {
-  const txt = fs.readFileSync(name, "utf8");
-  return compileFromText(txt, name, logger);
+export function compileFromFile(filename: string, logger: Logger) {
+  const textContent = fs.readFileSync(filename, "utf8");
+  return compileFromText(textContent, filename, logger);
 }
 
 export function compileFromText(textContent: string, filename: string, logger: Logger) {
