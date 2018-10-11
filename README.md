@@ -1,4 +1,6 @@
 # Arlecchino
+[![CircleCI](https://circleci.com/gh/Quramy/arlecchino.svg?style=svg)](https://circleci.com/gh/Quramy/arlecchino)
+[![npm version](https://badge.fury.io/js/arlecchino.svg)](https://badge.fury.io/js/arlecchino)
 
 DSL for e2e testing.
 
