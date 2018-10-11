@@ -1,4 +1,4 @@
-import { compile } from "./compile";
+import { compileFromFile } from "./compile";
 import { Context, run } from "./runner";
 import { LogLevel, ConsoleLogger } from "./logger";
 
@@ -12,10 +12,8 @@ export async function main(opt: MainOption) {
   const logger = new ConsoleLogger();
   logger.level = opt.logLevel;
   const { suiteFile } = opt;
-  const result = compile(suiteFile, logger);
-  if (!result) {
-    return false;
-  }
+  const result = compileFromFile(suiteFile, logger);
+  if (!result) return false;
   const { rootModel, metadata } = result;
   logger.debug("Compiled model: ");
   logger.debugObj(rootModel);

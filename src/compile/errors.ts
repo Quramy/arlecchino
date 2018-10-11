@@ -56,6 +56,16 @@ export class NoRequiredValueError extends CompileError {
   }
 }
 
+export class NotAllowedKeyError extends CompileError {
+  constructor(node: YAMLNode, private readonly key: string, private readonly allowedKeys: string[]) {
+    super(node);
+  }
+
+  shortMessage() {
+    return `Key '${this.key}' is not allowed in this position. Allowed keys are ${this.allowedKeys.map(k => "'" + k + "'").join(", ")}`;
+  }
+}
+
 export class NotAllowedValueTypeError extends CompileError {
 
   constructor(node: YAMLNode, private readonly type: string) {

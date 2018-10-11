@@ -5,7 +5,7 @@ import {
   YAMLSequence,
 } from "yaml-ast-parser";
 import { MetadataInCompilation, YAMLNumberValueNode } from "./types";
-import { NotAllowedValueTypeError, NoRequiredValueError } from "./errors";
+import { NotAllowedValueTypeError, NoRequiredValueError, NotAllowedKeyError } from "./errors";
 
 export type MappingDefinition<S, T, K extends keyof T> = {
   [P in keyof S]: [K, (node: YAMLNode) => T[K]];
@@ -14,15 +14,14 @@ export type MappingDefinition<S, T, K extends keyof T> = {
 export function mapWithMappingsNode<T, S>(node: YAMLNode, map: MappingDefinition<T, S, keyof S>, additional?: Partial<S>): S {
   const def = map as any;
   if (!node.mappings) {
-    // TODO
+    throw new NotAllowedValueTypeError(node, "mapping");
   }
   const ret = { } as any;
   node.mappings.forEach((n: YAMLMapping) => {
     const key = n.key.value;
     const wrap = def[key];
     if (!wrap) {
-      // TODO
-      throw new Error();
+      throw new NotAllowedKeyError(n.key, key, Object.keys(def));
     }
     const [name, fn] = wrap;
     ret[name] = fn(n.value);
