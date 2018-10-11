@@ -25,7 +25,7 @@ export type ViewportObject = {
 
 export type Scenario = {
   description: string,
-  configuration: Configuration,
+  configuration?: Configuration,
   steps: Step[],
 };
 
@@ -60,7 +60,7 @@ export type FindStepBody = {
   query: string,
   with_text?: string,
   action?: FindAction | FindAction[],
-  find?: FindStep,
+  find?: FindStepBody,
 };
 
 export type FindAction =

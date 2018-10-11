@@ -7,12 +7,12 @@ import { YAMLNode } from "yaml-ast-parser";
 import { MetadataInCompilation as Metadata } from "../types";
 import * as schema from "../../schema";
 import * as models from "../../model";
-import { setMetadata, normalizeOneOrMany, mapWithMappingsNode } from "../yaml-util";
+import { setMetadata, normalizeOneOrMany, convertMapping } from "../yaml-util";
 import { IncludeFileNotFoundError, NoSupportedIncludeVariablesFormatError } from "../errors";
 import { createTemplateStringModel } from "./template-string";
 
 export function createConfigurationModel(node: YAMLNode, metadata: Metadata): models.Configuration {
-  return setMetadata(mapWithMappingsNode<schema.Configuration, models.Configuration>(node, {
+  return setMetadata(convertMapping<schema.Configuration, models.Configuration>(node, {
     base_uri: ["baseUri", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
     include_var: ["includedVariables", (n: YAMLNode) => createIncludedVariables(n, metadata)],
     viewport: ["viewport", (n: YAMLNode) => createViewportModel(n, metadata)],
@@ -25,7 +25,7 @@ export function createViewportModel(node: YAMLNode, metadata: Metadata): models.
       name: createTemplateStringModel(node, metadata),
     } as models.Viewport, metadata, node);
   } else {
-    const vpObj = mapWithMappingsNode<schema.ViewportObject, models.ViewportObject>(node, {
+    const vpObj = convertMapping<schema.ViewportObject, models.ViewportObject>(node, {
       "width": ["width", (n: YAMLNode) => n.valueObject],
       "height": ["height", (n: YAMLNode) => n.valueObject],
       "device_scale_factor": ["deviceScaleFactor", (n: YAMLNode) => n.valueObject],

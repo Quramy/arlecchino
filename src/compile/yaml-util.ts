@@ -15,7 +15,7 @@ export type MappingDefinition<T, S, K extends keyof S> = {
   [P in keyof T]: [K, (node: YAMLNode) => S[K]];
 };
 
-export function mapWithMappingsNode<T, S>(node: YAMLNode, map: MappingDefinition<T, S, keyof S>, additional?: Partial<S>, opt?: MappingDefinitionOptions<T>): S {
+export function convertMapping<T, S>(node: YAMLNode, map: MappingDefinition<T, S, keyof S>, additional?: Partial<S>, opt?: MappingDefinitionOptions<T>): S {
   const def = map as any;
   if (!node.mappings) {
     throw new NotAllowedValueTypeError(node, "mapping");

@@ -2,7 +2,7 @@ import { YAMLNode, YamlMap as YAMLMap } from "yaml-ast-parser";
 import * as schema from "../../schema";
 import * as models from "../../model";
 import { MetadataInCompilation as Metadata } from "../types";
-import { setMetadata, hasKey, mapWithMappingsNode, normalizeOneOrMany, withValidateMappingType, withValidateNonNullMaping } from "../yaml-util";
+import { setMetadata, hasKey, convertMapping, normalizeOneOrMany, withValidateMappingType, withValidateNonNullMaping } from "../yaml-util";
 import { createTemplateStringModel } from "./template-string";
 
 export function isFindStepNode(node: YAMLNode): node is YAMLMap {
@@ -11,7 +11,7 @@ export function isFindStepNode(node: YAMLNode): node is YAMLMap {
 
 export function createFindStepModel(node: YAMLMap, metadata: Metadata): models.FindStep {
   function createInternal(node: YAMLNode): models.FindStep {
-    return setMetadata(mapWithMappingsNode<schema.FindStepBody, models.FindStep>(withValidateMappingType(node), {
+    return setMetadata(convertMapping<schema.FindStepBody, models.FindStep>(withValidateMappingType(node), {
       query: ["query", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
       with_text: ["withText", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
       action: ["actions", (n: YAMLNode) => createFindStepActionModels(n, metadata)],
@@ -32,7 +32,7 @@ export function createFindStepActionModels(node: YAMLNode, metadata: Metadata): 
     if (x.value === "click") {
       obj = { type: "click" } as models.ClickAction;
     } else {
-      obj = mapWithMappingsNode<schema.FindInputAction, models.TextInputAction>(x, {
+      obj = convertMapping<schema.FindInputAction, models.TextInputAction>(x, {
         input: ["value", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
       }, {
         type: "textInput",
