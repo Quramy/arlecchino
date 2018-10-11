@@ -1,2 +1,5 @@
 result/
 .DS_Store
+src/
+*.test.*
+testing/
