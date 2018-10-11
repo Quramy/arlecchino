@@ -1,4 +1,4 @@
-import * as models from "../model";
+import path from "path";
 import {
   launch,
   Browser,
@@ -9,6 +9,8 @@ import {
 import {
   render as mustacheRender,
 } from "mustache";
+
+import * as models from "../model";
 
 import {
   ResultWriter,
@@ -164,6 +166,8 @@ export class StepExecutor {
       return await eh.click();
     } else if (action.type === "textInput") {
       return await eh.type(this.evalString(action.value));
+    } else if (action.type === "fileUpload") {
+      return await eh.uploadFile.apply(eh, action.files.map(f => path.resolve(path.dirname(action.referencedBy), this.evalString(f))));
     }
   }
 }

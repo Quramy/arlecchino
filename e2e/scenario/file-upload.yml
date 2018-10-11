@@ -1,0 +1,12 @@
+description: File upload
+configuration:
+  base_uri: http://localhost:3000
+steps:
+  - goto: /file-upload.html
+  - find:
+      query: input[type='file']
+      action:
+        upload: samplpe.png
+  - sleep: 100
+  - pause
+  - screenshot

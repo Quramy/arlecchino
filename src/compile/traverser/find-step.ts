@@ -31,12 +31,22 @@ export function createFindStepActionModels(node: YAMLNode, metadata: Metadata): 
     let obj: models.FindStepAction;
     if (x.value === "click") {
       obj = { type: "click" } as models.ClickAction;
-    } else {
+    } else if (hasKey(x, "input")) {
       obj = convertMapping<schema.FindInputAction, models.TextInputAction>(x, {
         input: ["value", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
       }, {
         type: "textInput",
       });
+    } else if (hasKey(x, "upload")) {
+      obj = convertMapping<schema.FindUploadAction, models.FileUploadAction>(x, {
+        upload: ["files", (n: YAMLNode) => normalizeOneOrMany(n).map(nn => createTemplateStringModel(nn, metadata))],
+      }, {
+        type: "fileUpload",
+        referencedBy: metadata.currentFilename,
+      });
+    } else {
+      // TODO
+      throw new Error();
     }
     return setMetadata(obj, metadata, x);
   }) as models.FindStepAction[], metadata, node);

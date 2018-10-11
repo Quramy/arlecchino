@@ -72,7 +72,8 @@ export type FindStep = {
 
 export type FindStepAction =
   ClickAction |
-  TextInputAction
+  TextInputAction |
+  FileUploadAction
 ;
 
 export type ClickAction = {
@@ -84,6 +85,12 @@ export type TextInputAction = {
   value: TemplateString,
 };
 
+export type FileUploadAction = {
+  type: "fileUpload",
+  referencedBy: string,
+  files: TemplateString[],
+};
+
 export type TemplateString = {
   template: string,
-}
+};

@@ -65,11 +65,16 @@ export type FindStepBody = {
 
 export type FindAction =
   FindClickAction |
-  FindInputAction
+  FindInputAction |
+  FindUploadAction
 ;
 
 export type FindClickAction = "click";
 
 export type FindInputAction = {
   input: string,
+};
+
+export type FindUploadAction = {
+  upload: string | string[],
 };
