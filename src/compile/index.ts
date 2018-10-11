@@ -1,9 +1,6 @@
 import fs from "fs";
 import path from "path";
 import {
-  load as parseYaml,
-} from "js-yaml";
-import {
   load as loadYaml,
   YAMLNode,
   YAMLSequence,
@@ -24,6 +21,8 @@ import {
   NoSupportedIncludeVariablesFormatError,
 } from "./errors";
 import { Logger } from "../logger";
+import { createTemplateStringModel } from "./traverser/template-string";
+import { createConfigurationModel } from "./traverser/configuration";
 
 export function compile(name: string, logger: Logger) {
   const txt = fs.readFileSync(name, "utf8");
@@ -78,62 +77,6 @@ function createScenarioModels(n: YAMLNode, metadata: Metadata): model.Scenario[]
       steps: ["steps", (n: YAMLNode) => createStepModels(n as YAMLSequence, metadata)],
     }), metadata, node);
   });
-}
-
-function createConfigurationModel(node: YAMLNode, metadata: Metadata): model.Configuration {
-  return setMetadata(mapWithMappingsNode<schema.Configuration, model.Configuration>(node, {
-    base_uri: ["baseUri", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
-    include_var: ["includedVariables", (n: YAMLNode) => createIncludedVariables(n, metadata)],
-    viewport: ["viewport", (n: YAMLNode) => createViewportModel(n, metadata)],
-  }), metadata, node);
-}
-
-function createIncludedVariables(node: YAMLNode, metadata: Metadata) {
-  return normalizeOneOrMany(node).map(n => {
-    if (typeof n.value !== "string") {
-      // TODO
-      throw new Error();
-    }
-    const nameToBeIncluded = path.resolve(path.dirname(metadata.currentFilename), n.value);
-    if (!fs.existsSync(nameToBeIncluded)) {
-      throw new IncludeFileNotFoundError(n, nameToBeIncluded);
-    }
-    let contents: string;
-    contents = fs.readFileSync(nameToBeIncluded, "utf8");
-    metadata.fileMap.set(nameToBeIncluded, contents);
-    let variableObject;
-    try {
-      variableObject = JSON.parse(contents);
-    } catch (e) {
-      // nothing to do
-    }
-    try {
-      variableObject = parseYaml(contents);
-    } catch (e) {
-      throw new NoSupportedIncludeVariablesFormatError(n);
-    }
-    return variableObject;
-  }).reduce((acc, vars) => ({ ...acc, ...vars }), { });
-}
-
-function createViewportModel(node: YAMLNode, metadata: Metadata): model.Viewport {
-  if (typeof node.value === "string") {
-    return setMetadata({
-      name: createTemplateStringModel(node, metadata),
-    } as model.Viewport, metadata, node);
-  } else {
-    const vpObj = mapWithMappingsNode<schema.ViewportObject, model.ViewportObject>(node, {
-      "width": ["width", (n: YAMLNode) => n.valueObject],
-      "height": ["height", (n: YAMLNode) => n.valueObject],
-      "device_scale_factor": ["deviceScaleFactor", (n: YAMLNode) => n.valueObject],
-      "has_touch": ["deviceScaleFactor", (n: YAMLNode) => n.valueObject],
-      "is_mobile": ["isMobile", (n: YAMLNode) => n.valueObject],
-      "is_landscape": ["isLandscape", (n: YAMLNode) => n.valueObject],
-    });
-    return setMetadata({
-      value: vpObj,
-    } as model.Viewport, metadata, node);
-  }
 }
 
 function createStepModels(node: YAMLSequence, metadata: Metadata): model.Step[] {
@@ -233,8 +176,3 @@ function createStopStep(node: YAMLNode, metadata: Metadata): model.StopStep {
   } as model.StopStep, metadata, node);
 }
 
-function createTemplateStringModel(node: YAMLNode, metadata: Metadata): model.TemplateString {
-  return setMetadata({
-    template: node.value,
-  } as model.TemplateString, metadata, node);
-}

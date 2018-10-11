@@ -27,7 +27,7 @@ export abstract class CompileError extends Error {
 }
 
 export class IncludeFileNotFoundError extends CompileError {
-  constructor(node: YAMLNode, readonly filenameToBeIncluded: string) {
+  constructor(node: YAMLNode, private readonly filenameToBeIncluded: string) {
     super(node);
   }
 
@@ -43,5 +43,16 @@ export class NoSupportedIncludeVariablesFormatError extends CompileError {
 
   shortMessage() {
     return `This file is not supported format.`;
+  }
+}
+
+export class NotAllowedValueTypeError extends CompileError {
+
+  constructor(node: YAMLNode, private readonly type: string) {
+    super(node);
+  }
+
+  shortMessage() {
+    return `This field should be ${this.type}.`;
   }
 }
