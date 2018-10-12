@@ -13,7 +13,7 @@ export type Configuration = {
 
 export type IncludeVar = string | string[];
 
-export type Viewport = "string" | ViewportObject;
+export type Viewport = /* string | */ ViewportObject;
 export type ViewportObject = {
   width?: number,
   height?: number,
@@ -58,10 +58,19 @@ export type FindStep = {
 
 export type FindStepBody = {
   query: string,
+  // query: "$0" | string,
   with_text?: string,
+  // expose?: FindExposure | FindExposure[],
   action?: FindAction | FindAction[],
   find?: FindStepBody,
 };
+
+export type FindExposure = {
+  from: FindExposureFrom,
+  to: string,
+};
+
+export type FindExposureFrom = "text" | "html";
 
 export type FindAction =
   FindClickAction |

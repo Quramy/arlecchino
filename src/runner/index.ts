@@ -8,6 +8,7 @@ import {
 
 import {
   render as mustacheRender,
+  name,
 } from "mustache";
 
 import * as models from "../model";
