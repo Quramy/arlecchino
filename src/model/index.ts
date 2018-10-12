@@ -35,7 +35,8 @@ export type Step =
   ScreenshotStep |
   WaitForNavigationStep |
   FindStep |
-  PauseModel
+  PauseModel |
+  EchoStep
 ;
 
 export type SleepStep = {
@@ -45,6 +46,11 @@ export type SleepStep = {
 
 export type PauseModel = {
   type: "pause",
+};
+
+export type EchoStep = {
+  type: "echo",
+  messages: TemplateString[],
 };
 
 export interface GotoStep {
@@ -66,8 +72,14 @@ export type FindStep = {
   type: "find",
   query: TemplateString,
   withText?: TemplateString,
+  toStores?: FindStore[],
   actions?: FindStepAction[],
   child?: FindStep,
+};
+
+export type FindStore = {
+  from: "html" | "text",
+  expression: (number | string)[],
 };
 
 export type FindStepAction =

@@ -8,6 +8,7 @@ import { isGotoStepNode, createGotoStepModel } from "./goto-step";
 import { isWaitForNavigationStepNode, createWaitForNavigationStepModel } from "./wait-for-navigation-step";
 import { isFindStepNode, createFindStepModel } from "./find-step";
 import { setMetadata } from "../yaml-util";
+import { isEchoStepNodee, createEchoStepModel } from "./echo-step";
 
 export function createStepModels(node: YAMLSequence, metadata: Metadata): models.Step[] {
   return setMetadata(node.items.map(n => {
@@ -23,6 +24,8 @@ export function createStepModels(node: YAMLSequence, metadata: Metadata): models
       return createSleepStep(n, metadata);
     } else if (isPauseStepNode(n)) {
       return createPauseStepModel(n, metadata);
+    } else if (isEchoStepNodee(n)) {
+      return createEchoStepModel(n, metadata);
     }
   }) as models.Step[], metadata, node);
 }

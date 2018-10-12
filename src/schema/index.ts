@@ -52,6 +52,10 @@ export type WaitForNavigationStep = "wait_for_navigation";
 
 export type PauseStep = "pause";
 
+export type EchoStep = {
+  echo: string | string[],
+};
+
 export type FindStep = {
   find: FindStepBody,
 };
@@ -60,17 +64,17 @@ export type FindStepBody = {
   query: string,
   // query: "$0" | string,
   with_text?: string,
-  // expose?: FindExposure | FindExposure[],
+  store?: FindStore | FindStore[],
   action?: FindAction | FindAction[],
   find?: FindStepBody,
 };
 
-export type FindExposure = {
-  from: FindExposureFrom,
+export type FindStore = {
+  from: FindStoreFrom,
   to: string,
 };
 
-export type FindExposureFrom = "text" | "html";
+export type FindStoreFrom = "text" | "html";
 
 export type FindAction =
   FindClickAction |

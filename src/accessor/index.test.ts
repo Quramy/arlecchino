@@ -29,5 +29,6 @@ describe("assignValue", () => {
 
   it("should set value when expression is deeply unreachable", () => {
     expect(assignValue(["a", "b"], { }, 2)).toEqual({ a: { b: 2 } });
+    expect(assignValue([0, 0], [], 2)).toEqual([[2]]);
   });
 });

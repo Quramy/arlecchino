@@ -29,12 +29,17 @@ steps:
       action:
         input: TypeScript
   - sleep: 300
-  - screenshot
-  - pause
   - find:
       query: input[type='submit']
       action: click
   - wait_for_navigation
+  - find:
+      query: div.rc > div.s
+      store:
+        from: text 
+        to: description 
+  - echo: "{{ description }}"
+  - pause
   - find:
       query: .srg a
       action: click

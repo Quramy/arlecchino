@@ -22,6 +22,8 @@ import { Logger } from "../logger";
 import { sleep } from "./util";
 import { Metadata } from "../types/metadata";
 import { NoElementFoundError } from "./errors";
+import { AccessorExpression } from "../accessor/parse";
+import { assignValue } from "../accessor";
 
 function mergeConfiguration(...configurations: models.Configuration[]): models.Configuration {
   return configurations.reduce((acc, conf) => {
@@ -54,6 +56,8 @@ function nextStep(page: StepExecutor, step: models.Step) {
       return page.sleep(step);
     case "pause":
       return page.stop(step);
+    case "echo":
+      return page.echo(step);
     default:
       throw new Error("");
   }
@@ -70,7 +74,9 @@ export async function run(ctx: Context, rootModel: models.RootModel) {
         ctx.logger.debug(`Execute  - ${step.type} step.`);
         await nextStep(ctx.stepExecutor, step);
       }), Promise.resolve());
+      ctx.flush();
     } catch (e) {
+      ctx.flush();
       if (e instanceof NoElementFoundError) {
         ctx.logger.error(`Can't find element: ${e.key}: ${e.val}`);
         const traceMessage = e.traceMessage(ctx.metadata);
@@ -141,6 +147,20 @@ export class StepExecutor {
     } else {
       eh = ehList[0];
     }
+    if (step.toStores && step.toStores.length) {
+      await step.toStores.reduce((acc, s) => acc.then(async () => {
+        const result = await eh.executionContext().evaluate((x: HTMLElement, fromType: models.FindStore["from"]) => {
+          if (fromType === "html") {
+            return Promise.resolve(x.innerHTML);
+          } else if (fromType === "text") {
+            return Promise.resolve(x.textContent);
+          }
+        }, eh, s.from);
+        this.context.assignToStore(s.expression, result);
+        this.context.logger.debug("A value is stored:");
+        this.context.logger.debugObj(result);
+      }), Promise.resolve());
+    }
     if (step.actions && step.actions.length) {
       await step.actions.reduce((acc, s) => acc.then(() => this.executeFindAction(s, eh)), Promise.resolve());
     }
@@ -159,6 +179,10 @@ export class StepExecutor {
     } else {
       return Promise.resolve();
     }
+  }
+
+  async echo(step: models.EchoStep) {
+    step.messages.forEach(msg => this.context.logger.log(this.evalString(msg)));
   }
 
   // TODO refactor
@@ -205,6 +229,7 @@ export class Context {
   private _browser!: Browser;
   private _stepExecutor!: StepExecutor;
   private _currentConfiguration!: models.Configuration;
+  private _storedValue!: any;
 
   constructor(opt: ContextCreateOptions) {
     this.options = opt;
@@ -234,6 +259,7 @@ export class Context {
     }
     // TODO use out dir of cnofig
     this.resultWriter.setPrefix("result/" + scenarioName.replace(/\s+/g, "_"));
+    this._storedValue = { };
     this.counters.screenshot.reset();
     this._currentConfiguration = conf;
     this._currentPage = await this._browser.newPage();
@@ -251,13 +277,22 @@ export class Context {
     }
   }
 
+  async flush() {
+    await this.resultWriter.writeObjAsJson(this._storedValue, "storedValues.json");
+  }
+
   evaluateValue({ template }: { template: string }) {
     // TODO should be support to replacement for the included variables?
     const variables = { ...this.currentConfiguration.includedVariables };
     return mustacheRender(template, {
       ...variables,
+      ...this._storedValue,
       $env: process.env,
     });
+  }
+
+  assignToStore(expression: AccessorExpression, value: any) {
+    this._storedValue = assignValue(expression, this._storedValue, value);
   }
 
   get visible() {
