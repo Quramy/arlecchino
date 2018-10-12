@@ -1,6 +1,6 @@
 export type MetadataMapRecord = {
   filename: string,
-  postion: {
+  position: {
     start: number,
     end: number,
   },

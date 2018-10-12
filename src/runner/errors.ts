@@ -16,6 +16,6 @@ export class NoElementFoundError extends Error {
     const def = getDefinitionFromModel(m, metadata, 1);
     if (!def) return;
     return "Confirm the definition of this step:\n" + 
-      `${def.filename}:${def.postion.start.line + 1}:${def.postion.start.character + 1}` + "\n" + def.contents;
+      `${def.filename}:${def.position.start.line + 1}:${def.position.start.character + 1}` + "\n" + def.contents;
   }
 }

@@ -13,7 +13,7 @@ export function restore(model: any, metadata: Metadata) {
   if (!node) return;
   const file = metadata.fileMap.get(node.filename);
   if (!file) return;
-  const fragment = file.slice(node.postion.start, node.postion.end);
+  const fragment = file.slice(node.position.start, node.position.end);
   return {
     filename: node.filename,
     fragment,
@@ -24,13 +24,13 @@ export function getDefinionFromRecord(node: MetadataMapRecord, metadata: Metadat
   const file = metadata.fileMap.get(node.filename);
   if (!file) return;
   const lines = toLines(file);
-  const range = toLineAndCharcter(file, node.postion.start);
+  const range = toLineAndCharcter(file, node.position.start);
   const { line } = range;
   const start = Math.max(0, line - arround);
   const end = Math.min(lines.length, line + arround + 1);
   return {
     filename: node.filename,
-    postion: {
+    position: {
       start: range,
     },
     contents: lines.slice(start, end).join("\n"),

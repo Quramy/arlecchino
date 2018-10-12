@@ -77,7 +77,7 @@ export function withValidateNumberType(node: YAMLNode) {
 export function setMetadata<T>(obj: T, metadata: MetadataInCompilation, node: YAMLNode): T {
   metadata.nodeMap.set(obj, {
     filename: metadata.currentFilename,
-    postion: {
+    position: {
       start: node.startPosition,
       end: node.endPosition,
     },

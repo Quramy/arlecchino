@@ -16,13 +16,13 @@ export abstract class CompileError extends Error {
   definition(metadata: Metadata) {
     const def = getDefinionFromRecord({
       filename: metadata.currentFilename,
-      postion: {
+      position: {
         start: this.node.startPosition,
         end: this.node.endPosition,
       },
     }, metadata, 1);
     if (!def) return;
-    return `${def.filename}:${def.postion.start.line}:${def.postion.start.character}` + "\n" + def.contents;
+    return `${def.filename}:${def.position.start.line}:${def.position.start.character}` + "\n" + def.contents;
   }
 }
 
