@@ -22,7 +22,7 @@ export abstract class CompileError extends Error {
       },
     }, metadata, 1);
     if (!def) return;
-    return `${def.filename}:${def.position.start.line}:${def.position.start.character}` + "\n" + def.contents;
+    return `${def.filename}:${def.position.start.line + 1}:${def.position.start.character + 1}` + "\n" + def.contents;
   }
 }
 
