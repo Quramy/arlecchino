@@ -44,7 +44,7 @@ $ arlecchino example.yml
 ```
 
 ### Guide
-*T.B.D.*
+Read [this page](https://github.com/Quramy/arlecchino/blob/master/guide.md).
 
 ## License
 MIT
