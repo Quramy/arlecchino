@@ -84,12 +84,17 @@ export type FindStore = {
 
 export type FindStepAction =
   ClickAction |
+  SubmitAction |
   TextInputAction |
   FileUploadAction
 ;
 
 export type ClickAction = {
   type: "click",
+};
+
+export type SubmitAction = {
+  type: "submit";
 };
 
 export type TextInputAction = {

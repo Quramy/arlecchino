@@ -15,29 +15,23 @@ Write test scenario.
 ```yaml
 # example.yml
 
-description: Search TypeScript via Google
-configuration:
-  base_uri: https://google.co.jp
+description: Search Arlecchino with NPM
 steps:
-  - goto: /search
+  - goto: https://www.npmjs.com
   - find:
-      query: input[name='q']
+      query: input[type='search'][name='q']
       action:
-        input: TypeScript
-  - sleep: 300
+        input: arlecchino
   - screenshot
   - find:
-      query: input[type='submit']
-      action: click
+      query: form#search
+      action: submit
   - wait_for_navigation
-  - find:
-      query: .srg a
-      action: click
-  - wait_for_navigation
+  - sleep: 300
   - screenshot
 ```
 
-Run.
+And run the scenario.
 
 ```sh
 $ arlecchino example.yml

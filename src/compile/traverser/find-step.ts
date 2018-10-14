@@ -43,6 +43,8 @@ export function createFindStepActionModels(node: YAMLNode, metadata: Metadata): 
     let obj: models.FindStepAction;
     if (x.value === "click") {
       obj = { type: "click" } as models.ClickAction;
+    } else if (x.value === "submit") {
+      obj = { type: "submit" } as models.SubmitAction;
     } else if (hasKey(x, "input")) {
       obj = convertMapping<schema.FindInputAction, models.TextInputAction>(x, {
         input: ["value", (n: YAMLNode) => createTemplateStringModel(n, metadata)],

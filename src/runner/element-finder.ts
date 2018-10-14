@@ -68,6 +68,11 @@ export class ElementFinder {
       if (!this.eh) return;
       if (action.type === "click") {
         return await this.eh.click();
+      } else if (action.type === "submit") {
+        return await this.eh.executionContext().evaluate((x: HTMLFormElement) => {
+          x.submit();
+          return Promise.resolve();
+        }, this.eh);
       } else if (action.type === "textInput") {
         return await this.eh.type(this.context.evaluateValue(action.value));
       } else if (action.type === "fileUpload") {

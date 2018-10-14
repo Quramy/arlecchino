@@ -1,47 +1,14 @@
-# configuration:
-#   base_uri: https://github.com
-# scenario:
-#   - description: Login
-#     steps:
-#       - goto: /login
-#       - screenshot
-#       - find:
-#           query: input[name='login']
-#           action:
-#             - input: Quramy
-#       - find:
-#           query: input[name='password']
-#           action:
-#             - input: "{{ $env.GH_PASSWORD }}"
-#       - screenshot
-#       - find:
-#           query: input[name='commit']
-#           action: click
-#       - wait_for_navigation
-#       - screenshot
-description: Search TypeScript via Google
-configuration:
-  base_uri: https://google.co.jp
+description: Search Arlecchino with NPM
 steps:
-  - goto: /search
+  - goto: https://www.npmjs.com
   - find:
-      query: input[name='q']
+      query: input[type='search'][name='q']
       action:
-        input: TypeScript
+        input: arlecchino
+  - screenshot
+  - find:
+      query: form#search
+      action: submit
+  - wait_for_navigation
   - sleep: 300
-  - find:
-      query: input[type='submit']
-      action: click
-  - wait_for_navigation
-  - find:
-      query: div.rc > div.s
-      store:
-        from: text 
-        to: description 
-  - echo: "{{ description }}"
-  - pause
-  - find:
-      query: .srg a
-      action: click
-  - wait_for_navigation
   - screenshot

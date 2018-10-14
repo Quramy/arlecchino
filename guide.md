@@ -88,7 +88,8 @@ You can manipulate the found element using `action` key. The available actions a
 
 - `click`
 - `input: <text to type>`
-- `upload: <filepath(s) to upload>`: *`input[type='file']` only*
+- `submit`: It's allows only when the element is `form`.
+- `upload: <filepath(s) to upload>`: It's allowed only when the element is `input[type='file']`
 
 #### Extract data from the found element
 

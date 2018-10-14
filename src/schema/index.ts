@@ -78,11 +78,14 @@ export type FindStoreFrom = "text" | "html";
 
 export type FindAction =
   FindClickAction |
+  FindSubmitAction |
   FindInputAction |
   FindUploadAction
 ;
 
 export type FindClickAction = "click";
+
+export type FindSubmitAction = "submit";
 
 export type FindInputAction = {
   input: string,
