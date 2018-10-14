@@ -1,0 +1,19 @@
+description: Find with text content
+configuration:
+  baseUri: https://github.com/Quramy
+  viewport: 
+    width: 1200
+    height: 800
+    landscape: true
+steps:
+  - goto:
+  - find:
+      queries: hoge
+      action: click
+  - sleep: "10000"
+  - find:
+      query: input
+      with_text: hoge
+      store:
+        from: text
+        to: "hoge["

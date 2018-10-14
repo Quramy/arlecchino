@@ -9,9 +9,8 @@ export type MainOption = {
 };
 
 export async function main(opt: MainOption) {
-  const logger = new ConsoleLogger();
-  logger.level = opt.logLevel;
-  const { suiteFile } = opt;
+  const { suiteFile, logLevel } = opt;
+  const logger = new ConsoleLogger(logLevel);
   const result = compileFromFile(suiteFile, logger);
   if (!result) return false;
   const { rootModel, metadata } = result;

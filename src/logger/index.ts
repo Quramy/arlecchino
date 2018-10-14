@@ -1,7 +1,9 @@
+import { Chalk } from "chalk/types";
 export type LogLevel = "verbose" | "normal" | "silent";
 
 export interface Logger {
   level: LogLevel;
+  chalk: Chalk;
   debug(...msg: string[]): any;
   debugObj(obj: any): any;
   log(...msg: string[]): any;
@@ -10,8 +12,11 @@ export interface Logger {
 
 export class ConsoleLogger {
   level: LogLevel = "normal";
+  chalk: Chalk;
 
-  constructor() {
+  constructor(level: LogLevel) {
+    this.level = level;
+    this.chalk = require("chalk") as Chalk;
   }
 
   debug(...msg: string[]) {

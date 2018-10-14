@@ -1,28 +1,29 @@
 import { YAMLNode, YamlMap as YAMLMap, YAMLMapping } from "yaml-ast-parser";
+import chalk, { Chalk } from "chalk";
 import { MetadataInCompilation as Metadata } from "./types";
-import { getDefinionFromRecord } from "../logger/trace-functions";
+import { getDefinionFromRecord, getDefinionLinesFromRecord } from "../logger/trace-functions";
 
 export abstract class CompileError extends Error {
 
   readonly node: YAMLNode;
+  chalk!: Chalk;
 
   constructor(node: YAMLNode) {
     super();
+    this.chalk = chalk;
     this.node = node;
   }
 
   abstract shortMessage(): string;
 
   definition(metadata: Metadata) {
-    const def = getDefinionFromRecord({
+    return getDefinionLinesFromRecord({
       filename: metadata.currentFilename,
       position: {
         start: this.node.startPosition,
         end: this.node.endPosition,
       },
-    }, metadata, 1);
-    if (!def) return;
-    return `${def.filename}:${def.position.start.line + 1}:${def.position.start.character + 1}` + "\n" + def.contents;
+    }, metadata);
   }
 }
 
@@ -52,7 +53,7 @@ export class NoRequiredValueError extends CompileError {
   }
 
   shortMessage() {
-    return `This field is requierd.`;
+    return `A value is required.`;
   }
 }
 
@@ -84,5 +85,15 @@ export class NotAllowedValueTypeError extends CompileError {
 
   shortMessage() {
     return `This field should be ${this.type}.`;
+  }
+}
+
+export class AssignmentExpressionParseError extends CompileError {
+  constructor(node: YAMLNode, private readonly msg: string) {
+    super(node);
+  }
+
+  shortMessage() {
+    return this.msg;
   }
 }

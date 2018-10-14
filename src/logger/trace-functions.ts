@@ -19,21 +19,39 @@ export function restore(model: any, metadata: Metadata) {
     fragment,
   };
 }
+export function getDefinionLinesFromRecord(node: MetadataMapRecord, metadata: Metadata) {
+  const file = metadata.fileMap.get(node.filename);
+  if (!file) return;
+  const lines = toLines(file);
+  const startLC = toLineAndCharcter(file, node.position.start);
+  const endLC = toLineAndCharcter(file, node.position.end);
+  const startLine = startLC.line;
+  const endLine = endLC.line + 1;
+  return {
+    filename: node.filename,
+    position: {
+      start: startLC,
+      end: endLC,
+    },
+    lines: lines.slice(startLine, endLine)
+  };
+}
 
 export function getDefinionFromRecord(node: MetadataMapRecord, metadata: Metadata, arround = 0) {
   const file = metadata.fileMap.get(node.filename);
   if (!file) return;
   const lines = toLines(file);
-  const range = toLineAndCharcter(file, node.position.start);
-  const { line } = range;
-  const start = Math.max(0, line - arround);
-  const end = Math.min(lines.length, line + arround + 1);
+  const startLC = toLineAndCharcter(file, node.position.start);
+  const endLC = toLineAndCharcter(file, node.position.end);
+  const startLine = Math.max(0, startLC.line - arround);
+  const endLine = Math.min(lines.length, endLC.line + arround + 1);
   return {
     filename: node.filename,
     position: {
-      start: range,
+      start: startLC,
+      end: endLC,
     },
-    contents: lines.slice(start, end).join("\n"),
+    contents: lines.slice(startLine, endLine).join("\n"),
   };
 }
 

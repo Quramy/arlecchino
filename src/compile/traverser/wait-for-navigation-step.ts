@@ -1,7 +1,7 @@
 import { YAMLNode } from "yaml-ast-parser";
 import * as models from "../../model";
 import { MetadataInCompilation as Metadata } from "../types";
-import { setMetadata } from "../yaml-util";
+import { setMetadata, withCatchCompileError } from "../yaml-util";
 import { createTemplateStringModel } from "./template-string";
 
 export function isWaitForNavigationStepNode(node: YAMLNode) {
@@ -9,8 +9,8 @@ export function isWaitForNavigationStepNode(node: YAMLNode) {
 }
 
 export function createWaitForNavigationStepModel(node: YAMLNode, metadata: Metadata): models.WaitForNavigationStep {
-  return setMetadata({
+  return withCatchCompileError(() => setMetadata({
     type: "waitForNavigation",
     timeout: 10_000,
-  } as models.WaitForNavigationStep, metadata, node);
+  } as models.WaitForNavigationStep, metadata, node), metadata);
 }

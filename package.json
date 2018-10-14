@@ -33,12 +33,14 @@
     "typescript": "^3.1.1"
   },
   "dependencies": {
+    "@types/chalk": "^2.2.0",
     "@types/js-yaml": "^3.11.2",
     "@types/mkdirp": "^0.5.2",
     "@types/mustache": "^0.8.31",
     "@types/puppeteer": "^1.8.0",
     "@types/rimraf": "^2.0.2",
     "@types/yargs": "^12.0.1",
+    "chalk": "^2.4.1",
     "js-yaml": "^3.12.0",
     "mkdirp": "^0.5.1",
     "mustache": "^3.0.0",

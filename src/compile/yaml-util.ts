@@ -5,7 +5,7 @@ import {
   YAMLSequence,
 } from "yaml-ast-parser";
 import { MetadataInCompilation, YAMLNumberValueNode } from "./types";
-import { NotAllowedValueTypeError, NoRequiredValueError, NotAllowedKeyError, RequiredKeyNotExistError } from "./errors";
+import { NotAllowedValueTypeError, NoRequiredValueError, NotAllowedKeyError, RequiredKeyNotExistError, CompileError } from "./errors";
 
 export type MappingDefinitionOptions<T> = {
   requiredKeys?: (keyof T)[],
@@ -72,6 +72,19 @@ export function withValidateNumberType(node: YAMLNode) {
     return node as YAMLNumberValueNode;
   }
   throw new NotAllowedValueTypeError(node, "number");
+}
+
+export function withCatchCompileError<T extends () => any>(fn: T, metadata: MetadataInCompilation): ReturnType<T> {
+  if (!metadata.catchCompileError) return fn();
+  try {
+    return fn();
+  } catch (e) {
+    if (e instanceof CompileError) {
+      metadata.caughedErrors.push(e);
+      return ({ } as any) as ReturnType<T>;
+    }
+    throw e;
+  }
 }
 
 export function setMetadata<T>(obj: T, metadata: MetadataInCompilation, node: YAMLNode): T {

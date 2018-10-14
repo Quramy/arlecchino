@@ -7,32 +7,32 @@ import { YAMLNode } from "yaml-ast-parser";
 import { MetadataInCompilation as Metadata } from "../types";
 import * as schema from "../../schema";
 import * as models from "../../model";
-import { setMetadata, normalizeOneOrMany, convertMapping } from "../yaml-util";
+import { setMetadata, normalizeOneOrMany, convertMapping, withCatchCompileError } from "../yaml-util";
 import { IncludeFileNotFoundError, NoSupportedIncludeVariablesFormatError } from "../errors";
 import { createTemplateStringModel } from "./template-string";
 
 export function createConfigurationModel(node: YAMLNode, metadata: Metadata): models.Configuration {
-  return setMetadata(convertMapping<schema.Configuration, models.Configuration>(node, {
+  return withCatchCompileError(() => setMetadata(convertMapping<schema.Configuration, models.Configuration>(node, {
     base_uri: ["baseUri", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
     include_var: ["includedVariables", (n: YAMLNode) => createIncludedVariables(n, metadata)],
     viewport: ["viewport", (n: YAMLNode) => createViewportModel(n, metadata)],
-  }), metadata, node);
+  }), metadata, node), metadata);
 }
 
 export function createViewportModel(node: YAMLNode, metadata: Metadata): models.Viewport {
   if (typeof node.value === "string") {
-    return setMetadata({
+    return withCatchCompileError(() => setMetadata({
       name: createTemplateStringModel(node, metadata),
-    } as models.Viewport, metadata, node);
+    } as models.Viewport, metadata, node), metadata);
   } else {
-    const vpObj = convertMapping<schema.ViewportObject, models.ViewportObject>(node, {
+    const vpObj = withCatchCompileError(() => convertMapping<schema.ViewportObject, models.ViewportObject>(node, {
       "width": ["width", (n: YAMLNode) => n.valueObject],
       "height": ["height", (n: YAMLNode) => n.valueObject],
       "device_scale_factor": ["deviceScaleFactor", (n: YAMLNode) => n.valueObject],
       "has_touch": ["deviceScaleFactor", (n: YAMLNode) => n.valueObject],
       "is_mobile": ["isMobile", (n: YAMLNode) => n.valueObject],
       "is_landscape": ["isLandscape", (n: YAMLNode) => n.valueObject],
-    });
+    }), metadata);
     return setMetadata({
       value: vpObj,
     } as models.Viewport, metadata, node);
@@ -40,7 +40,7 @@ export function createViewportModel(node: YAMLNode, metadata: Metadata): models.
 }
 
 export function createIncludedVariables(node: YAMLNode, metadata: Metadata) {
-  return normalizeOneOrMany(node).map(n => {
+  return normalizeOneOrMany(node).map(n => withCatchCompileError(() => {
     if (typeof n.value !== "string") {
       // TODO
       throw new Error();
@@ -64,5 +64,5 @@ export function createIncludedVariables(node: YAMLNode, metadata: Metadata) {
       throw new NoSupportedIncludeVariablesFormatError(n);
     }
     return variableObject;
-  }).reduce((acc, vars) => ({ ...acc, ...vars }), { });
+  }, metadata)).reduce((acc, vars) => ({ ...acc, ...vars }), { });
 }
