@@ -10,10 +10,10 @@ const cliOptions = yargs
   .wrap(120)
   .usage("arlecchino [options] <scenario YAML file>")
   .version(require("../package.json").version)
-  .option("showBrowser", { boolean: true, alias: "d" })
-  .option("verbose", { boolean: true, alias: "v" })
-  .option("quiet", { boolean: true, alias: "q" })
-  .option("test", { boolean: true, alias: "t" })
+  .option("showBrowser", { boolean: true, alias: "d", default: false, description: "Display browser" })
+  .option("verbose", { boolean: true, alias: "v", default: false, description: "Show debug log" })
+  .option("quiet", { boolean: true, alias: "q", default: false, description: "Suppress all log" })
+  .option("test", { boolean: true, alias: "t", default: false, description: "Only validate scenario file. Not run" })
 
 if (!cliOptions.argv._.length) {
   cliOptions.showHelp();
