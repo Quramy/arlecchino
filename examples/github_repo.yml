@@ -22,4 +22,7 @@ steps:
   - find:
       query: h2
       with_text: License
+      store:
+        from: text 
+        to: h2.text
   - pause

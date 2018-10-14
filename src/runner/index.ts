@@ -3,18 +3,18 @@ import * as models from "../model";
 import { NoElementFoundError } from "./errors";
 import { ExecutionContext } from "./types";
 import { mergeConfiguration } from "./merge-configuration";
+import { runSequential } from "./util";
 
 export async function run(ctx: ExecutionContext, rootModel: models.RootModel) {
-  await rootModel.scenarios.reduce(async (acc, scenario) => {
-    await acc;
+  await runSequential(rootModel.scenarios, async (scenario) => {
     const conf = mergeConfiguration(rootModel.configuration, scenario.configuration);
     await ctx.preparePage({ conf, scenarioName: scenario.description });
     ctx.logger.log(`Execute scenario: "${scenario.description}" .`);
     try {
-      await scenario.steps.reduce((acc, step) => acc.then(async () => {
+      await runSequential(scenario.steps, async step => {
         ctx.logger.debug(`Execute  - ${step.type} step.`);
         await ctx.stepExecutor.executeStep(step);
-      }), Promise.resolve());
+      });
       ctx.flush();
     } catch (e) {
       ctx.flush();
@@ -26,6 +26,5 @@ export async function run(ctx: ExecutionContext, rootModel: models.RootModel) {
       }
       throw e;
     }
-  }, Promise.resolve());
-  return;
+  });
 }
