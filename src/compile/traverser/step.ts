@@ -9,6 +9,7 @@ import { isWaitForNavigationStepNode, createWaitForNavigationStepModel } from ".
 import { isFindStepNode, createFindStepModel } from "./find-step";
 import { setMetadata, withCatchCompileError } from "../yaml-util";
 import { isEchoStepNodee, createEchoStepModel } from "./echo-step";
+import { NotMatchedSequenceItemError } from "../errors";
 
 export function createStepModels(node: YAMLSequence, metadata: Metadata): models.Step[] {
   return withCatchCompileError(() => setMetadata(node.items.map(n => {
@@ -26,6 +27,8 @@ export function createStepModels(node: YAMLSequence, metadata: Metadata): models
       return createPauseStepModel(n, metadata);
     } else if (isEchoStepNodee(n)) {
       return createEchoStepModel(n, metadata);
+    } else {
+      throw new NotMatchedSequenceItemError(n);
     }
   }) as models.Step[], metadata, node), metadata);
 }

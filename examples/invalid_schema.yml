@@ -11,6 +11,7 @@ steps:
       queries: hoge
       action: click
   - sleep: "10000"
+  - screenshots
   - find:
       query: input
       with_text: hoge

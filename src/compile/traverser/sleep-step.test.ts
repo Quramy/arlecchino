@@ -1,6 +1,4 @@
-import assert from "assert";
 import { load, YamlMap as YAMLMap } from "yaml-ast-parser";
-import { MetadataInCompilation } from "../types";
 import { dummyMetadata } from "../testing";
 
 import { isSleepStepNode, createSleepStep } from "./sleep-step";

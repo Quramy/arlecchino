@@ -1,4 +1,4 @@
-import { YAMLNode, YamlMap as YAMLMap, YAMLMapping } from "yaml-ast-parser";
+import { YAMLNode, YamlMap as YAMLMap, YAMLMapping, YAMLSequence } from "yaml-ast-parser";
 import chalk, { Chalk } from "chalk";
 import { MetadataInCompilation as Metadata } from "./types";
 import { getDefinionFromRecord, getDefinionLinesFromRecord } from "../logger/trace-functions";
@@ -74,6 +74,17 @@ export class NotAllowedKeyError extends CompileError {
 
   shortMessage() {
     return `Key '${this.key}' is not allowed in this position. Allowed keys are ${this.allowedKeys.map(k => "'" + k + "'").join(", ")}`;
+  }
+}
+
+export class NotMatchedSequenceItemError extends CompileError {
+
+  constructor(node: YAMLNode) {
+    super(node);
+  }
+
+  shortMessage() {
+    return "This item is not allowed in this sequence.";
   }
 }
 
