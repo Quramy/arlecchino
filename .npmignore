@@ -2,4 +2,6 @@ result/
 .DS_Store
 src/
 *.test.*
-testing/
+*/testing/
+yarn.lock
+e2e/
