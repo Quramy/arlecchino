@@ -8,7 +8,16 @@ import { createRootModel } from "./traverser/suite";
 import { createLoggingCompileErrorsHandler } from "./error-handler";
 
 export function compileFromFile(filename: string, logger: Logger) {
-  const textContent = fs.readFileSync(filename, "utf8");
+  let textContent: string;
+  try {
+    textContent = fs.readFileSync(filename, "utf8");
+  } catch (e) {
+    if (e.message) {
+      logger.error(`Cannot open '${filename}'.`);
+      return;
+    } 
+    throw e;
+  }
   return compileFromText(textContent, filename, createLoggingCompileErrorsHandler(logger));
 }
 
@@ -19,14 +28,14 @@ export function compileFromText(textContent: string, filename: string, errorHand
   const metadata = {
     currentFilename: filename,
     catchCompileError: !!errorHandler,
-    caughedErrors: [],
+    caughtErrors: [],
     fileMap,
     nodeMap: new Map(),
   } as Metadata;
 
   const rootModel = createRootModel(parse(textContent), metadata);
-  if (metadata.caughedErrors.length && errorHandler) {
-    errorHandler(metadata.caughedErrors, metadata);
+  if (metadata.caughtErrors.length && errorHandler) {
+    errorHandler(metadata.caughtErrors, metadata);
     return;
   }
   return {

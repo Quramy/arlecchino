@@ -80,7 +80,7 @@ export function withCatchCompileError<T extends () => any>(fn: T, metadata: Meta
     return fn();
   } catch (e) {
     if (e instanceof CompileError) {
-      metadata.caughedErrors.push(e);
+      metadata.caughtErrors.push(e);
       return ({ } as any) as ReturnType<T>;
     }
     throw e;

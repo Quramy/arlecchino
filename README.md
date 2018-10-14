@@ -40,7 +40,7 @@ steps:
 Run.
 
 ```sh
-$ arlecchino -s example.yml
+$ arlecchino example.yml
 ```
 
 ### Guide

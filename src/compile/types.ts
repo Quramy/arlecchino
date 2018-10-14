@@ -10,7 +10,7 @@ import {
 import { CompileError } from "./errors";
 
 export type MetadataInCompilation = BaseMetadata & {
-  caughedErrors: CompileError[];
+  caughtErrors: CompileError[];
   catchCompileError: boolean;
   currentFilename: string,
 };
