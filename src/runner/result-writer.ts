@@ -1,12 +1,7 @@
 import fs from "fs";
 import path from "path";
 import * as mkdirp from "mkdirp";
-
-export interface ResultWriter {
-  setPrefix(prefix: string): void,
-  writeObjAsJson(obj: any, name: string): Promise<void>;
-  writeBinary(buf: Buffer, name: string): Promise<void>;
-}
+import { ResultWriter } from "./types";
 
 export class DefaultResultWriter implements ResultWriter {
   private prefix: string = "";

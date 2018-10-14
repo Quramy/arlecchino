@@ -1,6 +1,7 @@
 import { compileFromFile } from "./compile";
-import { Context, run } from "./runner";
+import { run } from "./runner";
 import { LogLevel, ConsoleLogger } from "./logger";
+import { DefaultExecutionContext } from "./runner/execution-context";
 
 export type MainOption = {
   logLevel: LogLevel,
@@ -22,7 +23,7 @@ export async function main(opt: MainOption) {
     return true;
   }
 
-  const ctx = new Context({
+  const ctx = new DefaultExecutionContext({
     logger,
     showBrowser: opt.showBrowser,
     metadata,
