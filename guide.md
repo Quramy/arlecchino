@@ -7,7 +7,7 @@ A scenario file should have the following structure.
 ```yaml
 description: My scenario
 steps:
-  - goto: http:localhost/page.html
+  - goto: http://localhost/page.html
 ```
 
 - `description`: Description of the scenario. *Arlecchino* uses this value as an output directory name.
@@ -19,10 +19,10 @@ You can write multiple scenarios in a file. For example:
 scenario:
   - description: My first scenario
     steps:
-      - goto: http:localhost/page.html
+      - goto: http://localhost/page.html
   - description: My second scenario
     steps:
-      - goto: http:localhost/another_page.html
+      - goto: http://localhost/another_page.html
 ```
 
 ## Configuration
