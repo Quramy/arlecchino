@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc",
     "test:node": "jest --config jest.config.node.json",
-    "test": "npm run test:node",
+    "test:browser": "jest --config jest.config.browser.json",
+    "test": "npm run test:node && npm run test:browser",
     "e2e:serve:dev": "ts-node-dev e2e/server.ts",
     "prepare": "rimraf built && tsc"
   },
