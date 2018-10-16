@@ -46,7 +46,7 @@ export class DefaultStepExecutor implements StepExecutor {
   async goto(step: models.GotoStep) {
     const { baseUri } = this.context.currentConfiguration;
     const fragment = this.evalString(step.urlFragment);
-    const url = baseUri ? this.evalString(baseUri) + "/" + fragment : fragment;
+    const url = baseUri ? this.evalString(baseUri) + fragment : fragment;
     await this.page.goto(url);
   }
 

@@ -27,11 +27,11 @@ export class DefaultExecutionContext implements ExecutionContext {
   readonly counters: { screenshot: Counter };
   readonly metadata: Metadata;
   private readonly options: ContextCreateOptions;
-  private _currentPage!: Page;
-  private _browser!: Browser;
-  private _stepExecutor!: StepExecutor;
-  private _currentConfiguration!: models.Configuration;
-  private _storedValue!: any;
+  protected _currentPage!: Page;
+  protected _browser!: Browser;
+  protected _stepExecutor!: StepExecutor;
+  protected _currentConfiguration!: models.Configuration;
+  protected _storedValue!: any;
 
   constructor(opt: ContextCreateOptions) {
     this.options = opt;
@@ -51,7 +51,7 @@ export class DefaultExecutionContext implements ExecutionContext {
     await this._browser.close();
   }
 
-  async preparePage({ conf, scenarioName }: PreparePageOptions) {
+  protected async clearBrowser() {
     if (this._currentPage) {
       await this._currentPage.close();
     }
@@ -63,12 +63,16 @@ export class DefaultExecutionContext implements ExecutionContext {
       headless: !this.options.showBrowser,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
+    this._currentPage = await this._browser.newPage();
+  }
+
+  async preparePage({ conf, scenarioName }: PreparePageOptions) {
+    await this.clearBrowser();
     // TODO use out dir of cnofig
     this.resultWriter.setPrefix("result/" + scenarioName.replace(/\s+/g, "_"));
     this._storedValue = { };
     this.counters.screenshot.reset();
     this._currentConfiguration = conf;
-    this._currentPage = await this._browser.newPage();
 
     // TODO extract function
     const defaultViewport = {
