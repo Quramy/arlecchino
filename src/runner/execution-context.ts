@@ -42,10 +42,6 @@ export class DefaultExecutionContext implements ExecutionContext {
   }
 
   async init() {
-    this._browser = await launch({
-      headless: !this.options.showBrowser,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
     this._stepExecutor = new DefaultStepExecutor(this);
   }
 
@@ -59,6 +55,14 @@ export class DefaultExecutionContext implements ExecutionContext {
     if (this._currentPage) {
       await this._currentPage.close();
     }
+    if (this._browser) {
+      await sleep(100);
+      await this._browser.close();
+    }
+    this._browser = await launch({
+      headless: !this.options.showBrowser,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     // TODO use out dir of cnofig
     this.resultWriter.setPrefix("result/" + scenarioName.replace(/\s+/g, "_"));
     this._storedValue = { };
