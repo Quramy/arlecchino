@@ -7,7 +7,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "jest",
+    "test:node": "jest --config jest.config.node.json",
+    "test": "npm run test:node",
+    "e2e:serve:dev": "ts-node-dev e2e/server.ts",
     "prepare": "rimraf built && tsc"
   },
   "keywords": [
@@ -27,6 +29,7 @@
     "@types/jest": "^23.3.4",
     "express": "^4.16.4",
     "jest": "^23.6.0",
+    "jest-puppeteer": "^3.4.0",
     "ts-jest": "^23.10.4",
     "ts-node": "^7.0.1",
     "ts-node-dev": "^1.0.0-pre.30",
@@ -48,21 +51,5 @@
     "rimraf": "^2.6.2",
     "yaml-ast-parser": "^0.0.41",
     "yargs": "^12.0.2"
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "testRegex": "(integration-test/.*|(src/.*\\.test))\\.ts$",
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "\\.d\\.ts$",
-      "built/.*"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "ts",
-      "json"
-    ]
   }
 }

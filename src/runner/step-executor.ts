@@ -70,6 +70,12 @@ export class DefaultStepExecutor implements StepExecutor {
     }
   }
 
+  // async reseveNextDialog() {
+  //   this.context.currentPage.once("dialog", dialog => {
+  //     dialog.accept();
+  //   });
+  // }
+
   async echo(step: models.EchoStep) {
     step.messages.forEach(msg => this.context.logger.log(this.evalString(msg)));
   }

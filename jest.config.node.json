@@ -1,0 +1,17 @@
+{
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  },
+  "testRegex": "(integration-test/.*|(src/.*\\.test))\\.ts$",
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "src/runner/.*",
+    "\\.d\\.ts$",
+    "built/.*"
+  ],
+  "moduleFileExtensions": [
+    "js",
+    "ts",
+    "json"
+  ]
+}

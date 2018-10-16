@@ -1,0 +1,17 @@
+{
+  "preset": "jest-puppeteer",
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  },
+  "testRegex": "(integration-test/.*|(src/runner/.*\\.test))\\.ts$",
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "\\.d\\.ts$",
+    "built/.*"
+  ],
+  "moduleFileExtensions": [
+    "js",
+    "ts",
+    "json"
+  ]
+}
