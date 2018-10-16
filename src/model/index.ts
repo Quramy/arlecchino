@@ -36,7 +36,8 @@ export type Step =
   WaitForNavigationStep |
   FindStep |
   PauseModel |
-  EchoStep
+  EchoStep |
+  ReserveNextDialogAnswerStep
 ;
 
 export type SleepStep = {
@@ -66,6 +67,12 @@ export type ScreenshotStep = {
 export type WaitForNavigationStep = {
   type: "waitForNavigation",
   timeout: number,
+};
+
+export type ReserveNextDialogAnswerStep = {
+  type: "reserveNextDialogAnswer",
+  isAccept?: boolean,
+  text?: TemplateString,
 };
 
 export type FindStep = {

@@ -1,0 +1,11 @@
+description: dialog closing
+configuration:
+  base_uri: http://localhost:3000
+steps:
+  - goto: /dialog.html
+  - reserve_dialog_answer:
+      accept: true
+  - find:
+      query: "#btn_confirm"
+      action: click
+  - pause

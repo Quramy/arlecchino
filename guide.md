@@ -196,3 +196,34 @@ And you want restart executor's steps, type `_resume_()` and return key in devel
 steps:
   - pause
 ```
+
+### Reserve dialog answer
+This step reserves your answer for the next alert/confirm/prompt dialog. It should be executed before the dialog raises.
+
+
+```yaml
+steps:
+  - reserve_dialog_answer   # reserve to close dialog
+  - find:
+      query: button.open-some-dialog
+      action: click         # this action kicks some dialog and Arlecchino is going to close it
+```
+
+#### Examples
+
+```yaml
+steps:
+  - reserve_dialog_answer
+```
+
+```yaml
+steps:
+  - reserve_dialog_answer:
+      accept: false # dismiss prompt/confirm
+```
+
+```yaml
+steps:
+  - reserve_dialog_answer:
+      text: prompt message
+```

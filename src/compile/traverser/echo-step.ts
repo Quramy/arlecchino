@@ -4,7 +4,7 @@ import { MetadataInCompilation as Metadata } from "../types";
 import { setMetadata, hasKey, withValidateNonNullMaping, normalizeOneOrMany, withCatchCompileError } from "../yaml-util";
 import { createTemplateStringModel } from "./template-string";
 
-export function isEchoStepNodee(node: YAMLNode): node is YAMLMap {
+export function isEchoStepNode(node: YAMLNode): node is YAMLMap {
   return hasKey(node, "echo");
 }
 

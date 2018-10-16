@@ -56,6 +56,15 @@ export type EchoStep = {
   echo: string | string[],
 };
 
+export type ReserveDialogAnswerStep = "reserve_dialog_answer" | {
+  reserve_dialog_answer: ReserveDialogAnswerStepBody,
+};
+
+export type ReserveDialogAnswerStepBody = {
+  accept?: boolean,
+  text?: string,
+};
+
 export type FindStep = {
   find: FindStepBody,
 };

@@ -70,11 +70,16 @@ export class DefaultStepExecutor implements StepExecutor {
     }
   }
 
-  // async reseveNextDialog() {
-  //   this.context.currentPage.once("dialog", dialog => {
-  //     dialog.accept();
-  //   });
-  // }
+  async reserveNextDialogAnswer(step: models.ReserveNextDialogAnswerStep) {
+    this.context.currentPage.once("dialog", async dialog => {
+      if (step.isAccept !== false) {
+        const text = step.text ? this.context.evaluateValue(step.text) : "";
+        await dialog.accept(text);
+      } else {
+        await dialog.dismiss();
+      }
+    });
+  }
 
   async echo(step: models.EchoStep) {
     step.messages.forEach(msg => this.context.logger.log(this.evalString(msg)));

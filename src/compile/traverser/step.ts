@@ -8,8 +8,9 @@ import { isGotoStepNode, createGotoStepModel } from "./goto-step";
 import { isWaitForNavigationStepNode, createWaitForNavigationStepModel } from "./wait-for-navigation-step";
 import { isFindStepNode, createFindStepModel } from "./find-step";
 import { setMetadata, withCatchCompileError } from "../yaml-util";
-import { isEchoStepNodee, createEchoStepModel } from "./echo-step";
+import { isEchoStepNode, createEchoStepModel } from "./echo-step";
 import { NotMatchedSequenceItemError } from "../errors";
+import { isReserveDialogAnswerStepNode, createReserveNextDialogAnswerStepModel } from "./reserve-dialog-answer-step";
 
 export function createStepModels(node: YAMLSequence, metadata: Metadata): models.Step[] {
   return withCatchCompileError(() => setMetadata(node.items.map(n => {
@@ -25,8 +26,10 @@ export function createStepModels(node: YAMLSequence, metadata: Metadata): models
       return createSleepStep(n, metadata);
     } else if (isPauseStepNode(n)) {
       return createPauseStepModel(n, metadata);
-    } else if (isEchoStepNodee(n)) {
+    } else if (isEchoStepNode(n)) {
       return createEchoStepModel(n, metadata);
+    } else if (isReserveDialogAnswerStepNode(n)) {
+      return createReserveNextDialogAnswerStepModel(n, metadata);
     } else {
       throw new NotMatchedSequenceItemError(n);
     }

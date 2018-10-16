@@ -5,9 +5,20 @@
     <title>Confirm dialog</title>
   </head>
   <body>
-    <button id="btn">click me</button>
+    <button id="btn_alert">alert</button>
+    <button id="btn_confirm">confirm</button>
+    <button id="btn_prompt">prompt</button>
     <script>
-document.getElementById("btn").onclick = () => confirm("confirm");
+    document.getElementById("btn_alert").onclick = () => {
+      alert("alert!");
+      window.alerted = true;
+    };
+    document.getElementById("btn_confirm").onclick = () => {
+      window.confirmed = confirm("confirm!");
+    };
+    document.getElementById("btn_prompt").onclick = () => {
+      window.promptMessage = prompt("prompt!");
+    };
     </script>
   </body>
 </html>

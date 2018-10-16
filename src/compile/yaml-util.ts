@@ -4,7 +4,7 @@ import {
   YAMLMapping,
   YAMLSequence,
 } from "yaml-ast-parser";
-import { MetadataInCompilation, YAMLNumberValueNode } from "./types";
+import { MetadataInCompilation, YAMLNumberValueNode, YAMLBooleanValueNode } from "./types";
 import { NotAllowedValueTypeError, NoRequiredValueError, NotAllowedKeyError, RequiredKeyNotExistError, CompileError } from "./errors";
 
 export type MappingDefinitionOptions<T> = {
@@ -72,6 +72,13 @@ export function withValidateNumberType(node: YAMLNode) {
     return node as YAMLNumberValueNode;
   }
   throw new NotAllowedValueTypeError(node, "number");
+}
+
+export function withValidateBooleanType(node: YAMLNode) {
+  if ("valueObject" in node && typeof node.valueObject === "boolean") {
+    return node as YAMLBooleanValueNode;
+  }
+  throw new NotAllowedValueTypeError(node, "boolean");
 }
 
 export function withCatchCompileError<T extends () => any>(fn: T, metadata: MetadataInCompilation): ReturnType<T> {
