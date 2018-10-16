@@ -7,7 +7,7 @@ A scenario file should have the following structure.
 ```yaml
 description: My scenario
 steps:
-  - goto: http:localhost/page.html
+  - goto: http://localhost/page.html
 ```
 
 - `description`: Description of the scenario. *Arlecchino* uses this value as an output directory name.
@@ -19,10 +19,10 @@ You can write multiple scenarios in a file. For example:
 scenario:
   - description: My first scenario
     steps:
-      - goto: http:localhost/page.html
+      - goto: http://localhost/page.html
   - description: My second scenario
     steps:
-      - goto: http:localhost/another_page.html
+      - goto: http://localhost/another_page.html
 ```
 
 ## Configuration
@@ -71,7 +71,7 @@ find:
 
 The above query searches HTML elements whose tag is `<h2>` and returns the first element of the results.
 
-Sometimes you CSS query does not satisfy us. In that case, we can use `with_text` key.
+Sometimes CSS queries does not satisfy us. In that case, we can use `with_text` key.
 It filters the results of the CSS selector using the text it contains.
 
 ```yaml
@@ -88,7 +88,7 @@ You can manipulate the found element using `action` key. The available actions a
 
 - `click`
 - `input: <text to type>`
-- `submit`: It's allows only when the element is `form`.
+- `submit`: It's allowed only when the element is `form`.
 - `upload: <filepath(s) to upload>`: It's allowed only when the element is `input[type='file']`
 
 #### Extract data from the found element
