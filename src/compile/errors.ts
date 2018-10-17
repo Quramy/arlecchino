@@ -95,7 +95,7 @@ export class NotAllowedValueTypeError extends CompileError {
   }
 
   shortMessage() {
-    return `This field should be ${this.type}.`;
+    return `This value should be ${this.type}.`;
   }
 }
 

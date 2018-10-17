@@ -73,10 +73,13 @@ export type FindStepBody = {
   query: string,
   // query: "$0" | string,
   with_text?: string,
+  traverse?: FindTraverse | FindTraverse[],
   store?: FindStore | FindStore[],
   action?: FindAction | FindAction[],
   find?: FindStepBody,
 };
+
+export type FindTraverse = "prev" | "next" | "parent" | "first_child" | "last_child";
 
 export type FindStore = {
   from: FindStoreFrom,

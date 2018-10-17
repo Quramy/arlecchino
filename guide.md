@@ -130,6 +130,47 @@ The `store` hash has the following structure.
 
 And the stored value can be referenced by templates of after steps.
 
+#### Traverse found DOM tree
+
+You can traverse the DOM element by query and use the result as the found element using `traverse` key.
+
+For example, if you have an HTML such as:
+
+```html
+<dl>
+  <dt>title</dt>
+  <dd>description</dd>
+</dl>
+```
+
+And the following finds the `<dd>description</dd>` element.
+
+```yaml
+find:
+  query: dt
+  with_text: title
+  traverse: next
+```
+
+The available traversing value are:
+
+- `prev`: The previous sibling element
+- `next`: The next sibling element.
+- `parent`: The parent element.
+- `first_child`: The first child element.
+- `last_child`: The last child element.
+
+You can write more complex traversing with sequence:
+
+```yaml
+find:
+  query: "#some_query"
+  traverse:
+    - parent
+    - next
+    - first_child
+```
+
 #### Examples
 
 ```yaml
