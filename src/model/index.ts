@@ -79,10 +79,40 @@ export type FindStep = {
   type: "find",
   query: TemplateString,
   withText?: TemplateString,
+  traverse?: FindTraverse[],
   toStores?: FindStore[],
   actions?: FindStepAction[],
   child?: FindStep,
 };
+
+export type FindTraverse =
+  TraversePrevious |
+  TraverseNext |
+  TraverseParent |
+  TraverseFirst |
+  TraverseLast
+;
+
+export type TraversePrevious = {
+  type: "previous",
+};
+
+export type TraverseNext = {
+  type: "next",
+};
+
+export type TraverseParent = {
+  type: "parent",
+};
+
+export type TraverseFirst = {
+  type: "firstChild",
+};
+
+export type TraverseLast = {
+  type: "lastChild",
+};
+
 
 export type FindStore = {
   from: "html" | "text",
