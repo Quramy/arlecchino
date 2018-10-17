@@ -18,6 +18,7 @@ export class ElementFinder {
 
   async runAll() {
     await this.findElement();
+    await this.traverse();
     await this.store();
     await this.doActions();
   }
@@ -41,6 +42,42 @@ export class ElementFinder {
     } else {
       this.eh = ehList[0];
     }
+  }
+
+  async traverse() {
+    if (!this.eh || !this.step.traverse || !this.step.traverse.length) return;
+    await runSequential(this.step.traverse, async t => {
+      if (!this.eh) return;
+      try {
+        const newHandle = (await this.eh.executionContext().evaluateHandle((e: Element, t: models.FindTraverse) => {
+          const type = t.type;
+          let result: Element | null;
+          if (type === "previous") {
+            result = e.previousElementSibling;
+          } else if (type === "next") {
+            result = e.nextElementSibling;
+          } else if (type === "parent") {
+            result = e.parentElement;
+          } else if (type === "firstChild") {
+            result = e.firstElementChild;
+          } else if (type === "lastChild") {
+            result = e.lastElementChild;
+          } else {
+            return Promise.reject(new Error(""));
+          }
+          if (!result) {
+            return Promise.reject(new Error(""));
+          }
+          return Promise.resolve(result);
+        }, this.eh, t)).asElement();
+        if (!newHandle) {
+          throw new NoElementFoundError(this.step, "traverse", t.type);
+        }
+        this.eh = newHandle;
+      } catch (e) {
+        throw new NoElementFoundError(this.step, "traverse", t.type);
+      }
+    });
   }
 
   async store() {

@@ -91,14 +91,18 @@ export class DefaultExecutionContext implements ExecutionContext {
     await this.resultWriter.writeObjAsJson(this._storedValue, "storedValues.json");
   }
 
-  evaluateValue({ template }: { template: string }) {
+  getVariables() {
     // TODO should be support to replacement for the included variables?
     const variables = { ...this.currentConfiguration.includedVariables };
-    return mustacheRender(template, {
+    return {
       ...variables,
       ...this._storedValue,
       $env: process.env,
-    });
+    };
+  }
+
+  evaluateValue({ template }: { template: string }) {
+    return mustacheRender(template, this.getVariables());
   }
 
   assignToStore(expression: AccessorExpression, value: any) {

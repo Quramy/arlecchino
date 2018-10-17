@@ -53,6 +53,13 @@ export function normalizeOneOrMany(node: YAMLNode): YAMLNode[] {
   return [node];
 }
 
+export function withValidateSequenceType(node: YAMLNode) {
+  if (node && (node as any).items) {
+    return node as YAMLSequence;
+  }
+  throw new NotAllowedValueTypeError(node, "sequence");
+}
+
 export function withValidateMappingType(node: YAMLNode) {
   if (node && node.mappings) {
     return node as YAMLMap;

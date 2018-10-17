@@ -2,7 +2,7 @@ import assert from "assert";
 import { load, YamlMap as YAMLMap } from "yaml-ast-parser";
 import { MetadataInCompilation } from "../types";
 import { dummyMetadata } from "../testing";
-import { isFindStepNode, createFindStepModel, createFindStepStoreModels } from "./find-step";
+import { isFindStepNode, createFindStepModel, createFindStepStoreModels, createFindStepTraverseModels } from "./find-step";
 import { NotAllowedValueTypeError, RequiredKeyNotExistError, NoRequiredValueError } from "../errors";
 
 describe("isFindStepNode", () => {
@@ -69,6 +69,15 @@ describe("createFindStepModel", () => {
     `);
     expect(() => createFindStepModel(node as YAMLMap, dummyMetadata()))
       .toThrowError(NoRequiredValueError);
+  });
+});
+
+describe("createFindStepTraverseModels", () => {
+  it("should return models correctly", () => {
+    const node = load(`
+      - "prev"
+    `);
+    expect(createFindStepTraverseModels(node, dummyMetadata())).toEqual([{ type: "previous" }]);
   });
 });
 

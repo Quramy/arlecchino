@@ -6,6 +6,7 @@ import { setMetadata, hasKey, convertMapping, normalizeOneOrMany, withValidateMa
 import { createTemplateStringModel } from "./template-string";
 import { parse } from "../../accessor";
 import { createAccessorExpression } from "./accessor-expression";
+import { NotMatchedSequenceItemError } from "../errors";
 
 export function isFindStepNode(node: YAMLNode): node is YAMLMap {
   return hasKey(node, "find");
@@ -17,6 +18,7 @@ export function createFindStepModel(node: YAMLMap, metadata: Metadata): models.F
       () => setMetadata(convertMapping<schema.FindStepBody, models.FindStep>(withValidateMappingType(node), {
         query: ["query", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
         with_text: ["withText", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
+        traverse: ["traverse", (n: YAMLNode) => createFindStepTraverseModels(n, metadata)],
         store: ["toStores", (n: YAMLNode) => createFindStepStoreModels(n, metadata)],
         action: ["actions", (n: YAMLNode) => createFindStepActionModels(n, metadata)],
         find: ["child", createInternal],
@@ -25,6 +27,20 @@ export function createFindStepModel(node: YAMLMap, metadata: Metadata): models.F
     );
   }
   return createInternal(withValidateNonNullMaping(node.mappings[0]).value);
+}
+
+export function createFindStepTraverseModels(node: YAMLNode, metadata: Metadata): models.FindTraverse[] {
+  return withCatchCompileError(() => setMetadata(normalizeOneOrMany(node).map(x => {
+    const v = x.value as schema.FindTraverse;
+    let m: models.FindTraverse | null = null;
+    if (v === "prev")        m = { type: "previous"   } as models.FindTraverse;
+    if (v === "next")        m = { type: "next"       } as models.FindTraverse;
+    if (v === "parent")      m = { type: "parent"     } as models.FindTraverse;
+    if (v === "first_child") m = { type: "firstChild" } as models.FindTraverse;
+    if (v === "last_child")  m = { type: "lastChild"  } as models.FindTraverse;
+    if (m) return setMetadata(m, metadata, x);
+    throw new NotMatchedSequenceItemError(x);
+  }), metadata, node), metadata);
 }
 
 export function createFindStepStoreModels(node: YAMLNode, metadata: Metadata): models.FindStore[] {

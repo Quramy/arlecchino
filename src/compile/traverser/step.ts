@@ -7,13 +7,13 @@ import { isSleepStepNode, createSleepStep } from "./sleep-step";
 import { isGotoStepNode, createGotoStepModel } from "./goto-step";
 import { isWaitForNavigationStepNode, createWaitForNavigationStepModel } from "./wait-for-navigation-step";
 import { isFindStepNode, createFindStepModel } from "./find-step";
-import { setMetadata, withCatchCompileError } from "../yaml-util";
+import { setMetadata, withCatchCompileError, withValidateSequenceType } from "../yaml-util";
 import { isEchoStepNode, createEchoStepModel } from "./echo-step";
 import { NotMatchedSequenceItemError } from "../errors";
 import { isReserveDialogAnswerStepNode, createReserveNextDialogAnswerStepModel } from "./reserve-dialog-answer-step";
 
-export function createStepModels(node: YAMLSequence, metadata: Metadata): models.Step[] {
-  return withCatchCompileError(() => setMetadata(node.items.map(n => {
+export function createStepModels(node: YAMLNode, metadata: Metadata): models.Step[] {
+  return withCatchCompileError(() => setMetadata(withValidateSequenceType(node).items.map(n => {
     if (isScreenshotStepNode(n)) {
       return createScreenshotStepModel(n, metadata);
     } else if (isGotoStepNode(n)) {

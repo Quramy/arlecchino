@@ -1,0 +1,14 @@
+description: table
+configuration:
+  base_uri: http://localhost:3000
+steps:
+  - goto: /table.html
+  - find:
+      query: "#find_target"
+      traverse:
+        - parent
+        - next
+        - last_child
+      store:
+        from: text
+        to: value
