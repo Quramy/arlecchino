@@ -217,11 +217,24 @@ steps:
 ### Screenshot
 This step captures the current page and stores PNG image file.
 
+```yaml
+steps:
+  - screenshot:
+      name: my_page     # file name to be saved as.
+      full_page: false  # whether to capture entire page or not (default: true)
+```
+
 #### Examples
 
 ```yaml
 steps:
-  - screenshot
+  - screenshot        # saved as screenshot_<index>.png
+```
+
+```yaml
+steps:
+  - screenshot:
+      name: my_page   # saved as my_page.png
 ```
 
 ### Pause

@@ -46,7 +46,14 @@ export type SleepStep = {
   sleep: number,
 };
 
-export type ScreenshotStep = "screenshot";
+export type ScreenshotStep = "screenshot" | {
+  screenshot: ScreenshotStepBody,
+};
+
+export type ScreenshotStepBody = {
+  full_page?: boolean,
+  name?: string,
+};
 
 export type WaitForNavigationStep = "wait_for_navigation";
 

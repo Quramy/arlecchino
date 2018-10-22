@@ -35,7 +35,7 @@ export class DefaultStepExecutor implements StepExecutor {
     const buffer = await this.context.currentPage.screenshot({
       fullPage: step.fullPage,
     });
-    const fileName = "screenshot_" + this.context.counters.screenshot.getAndIncrement() + ".png";
+    const fileName = step.name ? `${this.context.evaluateValue(step.name)}.png` : "screenshot_" + this.context.counters.screenshot.getAndIncrement() + ".png";
     await this.context.resultWriter.writeBinary(buffer, fileName);
   }
 

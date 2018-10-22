@@ -61,6 +61,7 @@ export interface GotoStep {
 
 export type ScreenshotStep = {
   type: "screenshot",
+  name?: TemplateString,
   fullPage: boolean,
 };
 

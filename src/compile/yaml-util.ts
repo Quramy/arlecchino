@@ -15,7 +15,7 @@ export type MappingDefinition<T, S, K extends keyof S> = {
   [P in keyof T]: [K, (node: YAMLNode) => S[K]];
 };
 
-export function convertMapping<T, S>(node: YAMLNode, map: MappingDefinition<T, S, keyof S>, additional?: Partial<S>, opt?: MappingDefinitionOptions<T>): S {
+export function convertMapping<T, S>(node: YAMLNode, map: MappingDefinition<T, S, keyof S>, defaultValue?: Partial<S>, opt?: MappingDefinitionOptions<T>): S {
   const def = map as any;
   if (!node.mappings) {
     throw new NotAllowedValueTypeError(node, "mapping");
@@ -39,8 +39,8 @@ export function convertMapping<T, S>(node: YAMLNode, map: MappingDefinition<T, S
   if (missingKeys.size !== 0) {
     throw new RequiredKeyNotExistError(node as YAMLMap, Array.from(missingKeys.values()));
   }
-  if (!additional) return ret as S;
-  return Object.assign(ret, additional) as S;
+  if (!defaultValue) return ret as S;
+  return Object.assign(defaultValue, ret) as S;
 }
 
 export function hasKey(node: YAMLNode, k: string): node is YAMLMap {
