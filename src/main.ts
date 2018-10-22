@@ -30,7 +30,7 @@ export async function main(opt: MainOption) {
   });
   await ctx.init();
 
-  await run(ctx, rootModel); 
+  const results = await run(ctx, rootModel); 
   await ctx.shutdown();
-  return true;
+  return results.every(r => r.result);
 }

@@ -6,8 +6,8 @@ export function sleep(time = 0) {
   });
 }
 
-export function runSequential<T, S>(items: T[], runner: (item: T) => Promise<any>) {
-  return items.reduce((acc, x) => acc.then(() => runner(x)), Promise.resolve());
+export function runSequential<T, S>(items: T[], runner: (item: T) => Promise<S>) {
+  return items.reduce((acc, x) => acc.then((results) => runner(x).then(r => [...results, r])), Promise.resolve([] as S[]));
 }
 
 export class SimpleCounter implements Counter {

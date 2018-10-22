@@ -6,7 +6,7 @@ import { mergeConfiguration } from "./merge-configuration";
 import { runSequential } from "./util";
 
 export async function run(ctx: ExecutionContext, rootModel: models.RootModel) {
-  await runSequential(rootModel.scenarios, async (scenario) => {
+  return await runSequential(rootModel.scenarios, async (scenario) => {
     const conf = mergeConfiguration(rootModel.configuration, scenario.configuration);
     await ctx.preparePage({ conf, scenarioName: scenario.description });
     ctx.logger.log(`Execute scenario: "${scenario.description}" .`);
@@ -16,13 +16,14 @@ export async function run(ctx: ExecutionContext, rootModel: models.RootModel) {
         await ctx.stepExecutor.executeStep(step);
       });
       ctx.flush();
+      return { scenarioName: scenario.description, result: true };
     } catch (e) {
       ctx.flush();
       if (e instanceof NoElementFoundError) {
         ctx.logger.error(`Can't find element: ${e.key}: ${e.val}`);
         const traceMessage = e.traceMessage(ctx.metadata);
         if (traceMessage) ctx.logger.error(traceMessage);
-        return;
+        return { scenarioName: scenario.description, result: false };
       }
       throw e;
     }
