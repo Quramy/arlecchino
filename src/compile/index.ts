@@ -6,6 +6,7 @@ import { MetadataInCompilation as Metadata, CompileErrorsHandler } from "./types
 import { Logger } from "../logger";
 import { createRootModel } from "./traverser/suite";
 import { createLoggingCompileErrorsHandler } from "./error-handler";
+import { DefaultCompilationContext } from "./compilation-context";
 
 export function compileFromFile(filename: string, logger: Logger) {
   let textContent: string;
@@ -22,27 +23,21 @@ export function compileFromFile(filename: string, logger: Logger) {
 }
 
 export function compileFromText(textContent: string, filename: string, errorHandler?: CompileErrorsHandler) {
-  const fileMap = new Map();
-  fileMap.set(filename, textContent);
+  const context = new DefaultCompilationContext({
+    entryFilename: filename,
+    content: textContent,
+  });
 
-  const metadata = {
-    currentFilename: filename,
-    catchCompileError: !!errorHandler,
-    caughtErrors: [],
-    fileMap,
-    nodeMap: new Map(),
-  } as Metadata;
-
-  const rootModel = createRootModel(parse(textContent), metadata);
-  if (metadata.caughtErrors.length && errorHandler) {
-    errorHandler(metadata.caughtErrors, metadata);
+  const rootModel = createRootModel(parse(textContent), context);
+  if (context.caughtErrors.length && errorHandler) {
+    errorHandler(context.caughtErrors, context);
     return;
   }
   return {
     rootModel,
     metadata: {
-      fileMap: metadata.fileMap,
-      nodeMap: metadata.nodeMap,
+      fileMap: context.fileMap,
+      nodeMap: context.nodeMap,
     } as BaseMetadata,
   };
 }

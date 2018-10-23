@@ -10,9 +10,9 @@ export function mergeConfiguration(...configurations: models.Configuration[]): m
         ...acc.viewport,
         ...conf.viewport,
       },
-      includedVariables: {
-        ...acc.includedVariables,
-        ...conf.includedVariables,
+      importVariables: {
+        ...acc.importVariables,
+        ...conf.importVariables,
       },
     };
   }, { });

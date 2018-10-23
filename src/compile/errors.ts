@@ -27,13 +27,13 @@ export abstract class CompileError extends Error {
   }
 }
 
-export class IncludeFileNotFoundError extends CompileError {
-  constructor(node: YAMLNode, private readonly filenameToBeIncluded: string) {
+export class ImportFileNotFoundError extends CompileError {
+  constructor(node: YAMLNode, private readonly filename: string) {
     super(node);
   }
 
   shortMessage() {
-    return `Cann't find file: ${this.filenameToBeIncluded}`;
+    return `Cann't find file: ${this.filename}`;
   }
 }
 

@@ -8,10 +8,11 @@ export type Suite = {
 export type Configuration = {
   base_uri?: string,
   viewport?: ViewportObject,
-  include_var: IncludeVar,
+  include_var?: ImportVar,
+  import_var?: ImportVar,
 };
 
-export type IncludeVar = string | string[];
+export type ImportVar = string | string[];
 
 export type Viewport = /* string | */ ViewportObject;
 export type ViewportObject = {
