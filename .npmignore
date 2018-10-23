@@ -5,3 +5,6 @@ src/
 */testing/
 yarn.lock
 e2e/
+examples/
+scripts/
+.circleci/
