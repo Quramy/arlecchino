@@ -1,5 +1,27 @@
 # Guide
 
+* [Scenario](#scenario)
+* [Configuration](#configuration)
+  + [Base URI](#base-uri)
+  + [Import variables](#import-variables)
+  + [Viewport](#viewport)
+* [Step Reference](#step-reference)
+  + [Goto](#goto)
+    - [Examples](#examples)
+  + [Find](#find)
+    - [Do action to the found element](#do-action-to-the-found-element)
+    - [Extract data from the found element](#extract-data-from-the-found-element)
+    - [Traverse found DOM tree](#traverse-found-dom-tree)
+    - [Examples](#examples-1)
+  + [Sleep](#sleep)
+    - [Examples](#examples-2)
+  + [Screenshot](#screenshot)
+    - [Examples](#examples-3)
+  + [Pause](#pause)
+    - [Examples](#examples-4)
+  + [Reserve dialog answer](#reserve-dialog-answer)
+    - [Examples](#examples-5)
+
 ## Scenario
 
 A scenario file should have the following structure.
@@ -26,7 +48,62 @@ scenario:
 ```
 
 ## Configuration
-*T.B.D.*
+
+You can configure scenario(or scenarios) using `configuration` section.
+
+```yaml
+description: My scenario
+configuration:
+  base_uri: http://localhost 
+steps:
+  - goto: /page1.html
+  - goto: /page2.html
+```
+
+### Base URI
+
+`base_uri` sets the default URI prefix. See also [Goto step](#goto).
+
+### Import variables
+Almost all string fields in steps(e.g. find query, goto url) accept a template placeholder using `"{{ ... }}"` notation.
+The variables used in templates can be defined in external files.
+And you can import the external files using `import_var`.
+
+```yaml
+# scenario.yml
+
+configuration:
+  import_var: variables.yaml
+
+  # You can pass a sequence too
+  # import_var:
+  #   - variables.yaml
+steps:
+  - goto: "{{ login_page }}"
+```
+
+```yaml
+# variables.yml
+
+login_page: http://localhost/login.html
+```
+
+*Arlecchino* can read not only YAML but also JSON.
+
+### Viewport
+
+`viewport` allows us to set browser's viewport.
+
+For example:
+
+```yaml
+configuration:
+  viewport:
+    width: 1200
+    height: 800
+```
+
+See also https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetviewportviewport if you want more details.
 
 ## Step Reference
 
