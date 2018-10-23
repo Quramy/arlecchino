@@ -7,6 +7,12 @@
   <body>
     <form action="post">
       <input id="file1" type="file" />
+      <div id="out"></div>
     </form>
+    <script>
+document.getElementById("file1").addEventListener("change", () => {
+  document.getElementById("out").innerHTML = "success";
+});
+    </script>
   </body>
 </html>

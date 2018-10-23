@@ -24,6 +24,7 @@ jobs:
           command: yarn e2e:serve:dev
           background: true
       - run: yarn test
+      - run: sh scripts/e2e.sh
 
       - save_cache:
           paths:

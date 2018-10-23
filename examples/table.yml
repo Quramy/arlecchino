@@ -1,4 +1,4 @@
-description: table
+description: Traversing table
 configuration:
   base_uri: http://localhost:3000
 steps:

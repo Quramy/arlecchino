@@ -1,4 +1,4 @@
-description: dialog closing
+description: Dialog closing
 configuration:
   base_uri: http://localhost:3000
 steps:
@@ -8,4 +8,3 @@ steps:
   - find:
       query: "#btn_confirm"
       action: click
-  - pause

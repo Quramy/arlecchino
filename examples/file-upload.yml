@@ -6,7 +6,7 @@ steps:
   - find:
       query: input[type='file']
       action:
-        upload: samplpe.png
-  - sleep: 100
-  - pause
-  - screenshot
+        upload: data/samplpe.png
+  - find:
+      query: div
+      with_text: success
