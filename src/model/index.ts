@@ -5,7 +5,7 @@ export type RootModel = {
 
 export type Configuration = {
   baseUri?: TemplateString,
-  includedVariables?: any,
+  importVariables?: any,
   viewport?: Viewport,
 };
 

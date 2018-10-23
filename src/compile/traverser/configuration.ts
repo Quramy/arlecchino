@@ -14,7 +14,8 @@ import { createTemplateStringModel } from "./template-string";
 export function createConfigurationModel(node: YAMLNode, metadata: Metadata): models.Configuration {
   return withCatchCompileError(() => setMetadata(convertMapping<schema.Configuration, models.Configuration>(node, {
     base_uri: ["baseUri", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
-    include_var: ["includedVariables", (n: YAMLNode) => createIncludedVariables(n, metadata)],
+    include_var: ["importVariables", (n: YAMLNode) => createImportVariables(n, metadata)],  // secret
+    import_var: ["importVariables", (n: YAMLNode) => createImportVariables(n, metadata)],
     viewport: ["viewport", (n: YAMLNode) => createViewportModel(n, metadata)],
   }), metadata, node), metadata);
 }
@@ -39,7 +40,7 @@ export function createViewportModel(node: YAMLNode, metadata: Metadata): models.
   }
 }
 
-export function createIncludedVariables(node: YAMLNode, metadata: Metadata) {
+export function createImportVariables(node: YAMLNode, metadata: Metadata) {
   return normalizeOneOrMany(node).map(n => withCatchCompileError(() => {
     if (typeof n.value !== "string") {
       // TODO
