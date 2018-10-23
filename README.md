@@ -2,15 +2,15 @@
 [![CircleCI](https://circleci.com/gh/Quramy/arlecchino.svg?style=svg)](https://circleci.com/gh/Quramy/arlecchino)
 [![npm version](https://badge.fury.io/js/arlecchino.svg)](https://badge.fury.io/js/arlecchino)
 
-DSL for e2e testing.
+End-to-End testing library for Web apps.
 
 ## Getting started
 
-```
+```sh
 $ npm install -g arlecchino
 ```
 
-Write test scenario.
+Write a scenario file.
 
 ```yaml
 # example.yml
@@ -24,7 +24,7 @@ steps:
         input: arlecchino
   - screenshot
   - find:
-      query: form#search
+      query: "form#search"
       action: submit
   - wait_for_navigation
   - sleep: 300
@@ -39,6 +39,9 @@ $ arlecchino example.yml
 
 ### Guide
 Read [this page](https://github.com/Quramy/arlecchino/blob/master/guide.md).
+
+### How it works
+Arlecchino uses [GoogleChrome/Puppeteer](https://github.com/GoogleChrome/puppeteer).
 
 ## License
 MIT
