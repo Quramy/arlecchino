@@ -1,0 +1,8 @@
+description: Using variables
+configuration:
+  import_var: data/variable.yml
+  base_uri: "http://{{ host }}:{{ port }}"
+steps:
+  - goto: /index.html
+  - echo: "{{ host }}"
+  - echo: "{{ port }}"

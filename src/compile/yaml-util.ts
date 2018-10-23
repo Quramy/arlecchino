@@ -74,6 +74,13 @@ export function withValidateNonNullMaping(node: YAMLMapping) {
   throw new NoRequiredValueError(node);
 }
 
+export function withValidateStringType(node: YAMLNode) {
+  if (typeof node.value === "string") {
+    return node;
+  }
+  throw new NotAllowedValueTypeError(node, "string");
+}
+
 export function withValidateNumberType(node: YAMLNode) {
   if ("valueObject" in node && typeof node.valueObject === "number") {
     return node as YAMLNumberValueNode;

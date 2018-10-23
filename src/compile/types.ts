@@ -9,11 +9,12 @@ import {
 
 import { CompileError } from "./errors";
 
-export type MetadataInCompilation = BaseMetadata & {
-  caughtErrors: CompileError[];
+export interface MetadataInCompilation extends BaseMetadata {
+  readonly currentFilename: string;
+  readonly caughtErrors: CompileError[];
   catchCompileError: boolean;
-  currentFilename: string,
-};
+  readFile(filename: string): { absPath: string, content?: string };
+}
 
 export type CompileErrorsHandler = (errors: CompileError[], metadata: MetadataInCompilation) => void;
 
