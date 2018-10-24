@@ -1,4 +1,5 @@
 export type Root =  Suite | Scenario | Scenario[];
+export type DefinitionRoot = StepsDefinition | StepsDefinition[] | Suite;
 
 export type Suite = {
   configuration?: Configuration,
@@ -24,13 +25,17 @@ export type ViewportObject = {
   is_landscape?: boolean,
 };
 
-export type Scenario = {
+export type Scenario = StepsDefinition & {
   description: string,
   configuration?: Configuration,
-  steps: Step[],
 };
 
-export type Step = 
+export type StepsDefinition = {
+  ref_id?: string,
+  steps: (ImportSteps | Step)[],
+};
+
+export type Step =
   GotoStep |
   SleepStep |
   ScreenshotStep |
@@ -38,6 +43,10 @@ export type Step =
   FindStep |
   PauseStep
 ;
+
+export type ImportSteps = {
+  import_steps: string,
+};
 
 export type GotoStep = {
   goto: string,

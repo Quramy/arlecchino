@@ -5,14 +5,14 @@ import { MetadataInCompilation } from "./types";
 import { MetadataMapRecord } from "../types/metadata";
 
 export class DefaultCompilationContext implements MetadataInCompilation {
-  currentFilename: string;
   catchCompileError = true;
   readonly fileMap = new Map<string, string>();
   readonly nodeMap = new Map<any, MetadataMapRecord>();
   readonly caughtErrors = [];
+  private readingFileStack: { name: string }[] = [];
 
   constructor({ entryFilename, content }: { entryFilename: string, content: string }) {
-    this.currentFilename = entryFilename;
+    this.pushFileState(entryFilename);
     this.fileMap.set(entryFilename, content);
   }
 
@@ -35,5 +35,22 @@ export class DefaultCompilationContext implements MetadataInCompilation {
       absPath: filename,
       content,
     }
+  }
+
+  get currentFilename() {
+    return this.readingFileStack[this.readingFileStack.length - 1].name;
+  }
+
+  pushFileState(name: string) {
+    this.readingFileStack.push({ name });
+    return this;
+  }
+
+  popFileState() {
+    const state = this.readingFileStack.pop();
+    if (!state) {
+      throw new Error();
+    }
+    return state.name;
   }
 }

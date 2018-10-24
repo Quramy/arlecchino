@@ -12,6 +12,8 @@ import { CompileError } from "./errors";
 export interface MetadataInCompilation extends BaseMetadata {
   readonly currentFilename: string;
   readonly caughtErrors: CompileError[];
+  pushFileState(absoluteFilename: string): this;
+  popFileState(): string;
   catchCompileError: boolean;
   readFile(filename: string): { absPath: string, content?: string };
 }
