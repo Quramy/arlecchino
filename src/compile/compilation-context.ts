@@ -3,12 +3,13 @@ import path from "path";
 import { YAMLNode } from "yaml-ast-parser";
 import { MetadataInCompilation } from "./types";
 import { MetadataMapRecord } from "../types/metadata";
+import { CompileError } from "./errors";
 
 export class DefaultCompilationContext implements MetadataInCompilation {
   catchCompileError = true;
   readonly fileMap = new Map<string, string>();
   readonly nodeMap = new Map<any, MetadataMapRecord>();
-  readonly caughtErrors = [];
+  readonly caughtErrors: CompileError[] = [];
   private readingFileStack: { name: string }[] = [];
 
   constructor({ entryFilename, content }: { entryFilename: string, content: string }) {
@@ -39,6 +40,13 @@ export class DefaultCompilationContext implements MetadataInCompilation {
 
   get currentFilename() {
     return this.readingFileStack[this.readingFileStack.length - 1].name;
+  }
+
+  pushCompieError(error: CompileError) {
+    if (!this.caughtErrors) return this;
+    error.setOccurringFilename(this.currentFilename);
+    this.caughtErrors.push(error);
+    return this;
   }
 
   pushFileState(name: string) {

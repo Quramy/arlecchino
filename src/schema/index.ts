@@ -1,5 +1,5 @@
 export type Root =  Suite | Scenario | Scenario[];
-export type DefinitionRoot = StepsDefinition | StepsDefinition[] | Suite;
+export type StepsDefinitionRoot = StepsDefinition | StepsDefinition[] | Suite;
 
 export type Suite = {
   configuration?: Configuration,

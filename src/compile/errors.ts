@@ -7,6 +7,7 @@ export abstract class CompileError extends Error {
 
   readonly node: YAMLNode;
   chalk!: Chalk;
+  private occurringFilename?: string;
 
   constructor(node: YAMLNode) {
     super();
@@ -14,11 +15,16 @@ export abstract class CompileError extends Error {
     this.node = node;
   }
 
+  setOccurringFilename(filename: string) {
+    this.occurringFilename = filename;
+  }
+
   abstract shortMessage(): string;
 
   definition(metadata: Metadata) {
+    if (!this.occurringFilename) return;
     return getDefinionLinesFromRecord({
-      filename: metadata.currentFilename,
+      filename: this.occurringFilename,
       position: {
         start: this.node.startPosition,
         end: this.node.endPosition,
@@ -106,5 +112,28 @@ export class AssignmentExpressionParseError extends CompileError {
 
   shortMessage() {
     return this.msg;
+  }
+}
+
+export class TooManyStepsDefinitionsError extends CompileError {
+  constructor(node: YAMLNode) {
+    super(node);
+  }
+
+  shortMessage() {
+    return "There is a sequence which has more than 2 steps items. But you tried to import without ref_id. Specify which steps to import with '<filename>$<ref_id>'.";
+  }
+}
+
+export class NoStepsFoundError extends CompileError {
+  constructor(node: YAMLNode, private refId: string | undefined) {
+    super(node);
+  }
+
+  shortMessage() {
+    if (!this.refId) {
+      return "There is no steps to import.";
+    }
+    return `There is no steps to import whose ref_id is '${this.refId}'.`;
   }
 }

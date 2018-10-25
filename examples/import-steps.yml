@@ -1,0 +1,5 @@
+description: Using steps defined in other files
+configuration:
+  base_uri: http://localhost:3000
+steps:
+  - import_steps: file-upload.yml
