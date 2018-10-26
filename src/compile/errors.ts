@@ -1,7 +1,14 @@
+import path from "path";
 import { YAMLNode, YamlMap as YAMLMap, YAMLMapping, YAMLSequence } from "yaml-ast-parser";
 import chalk, { Chalk } from "chalk";
 import { MetadataInCompilation as Metadata } from "./types";
 import { getDefinionFromRecord, getDefinionLinesFromRecord } from "../logger/trace-functions";
+
+export class BaseCyclicImportError extends Error {
+  constructor(public readonly readStack: string[]) {
+    super();
+  }
+}
 
 export abstract class CompileError extends Error {
 
@@ -40,6 +47,17 @@ export class ImportFileNotFoundError extends CompileError {
 
   shortMessage() {
     return `Cann't find file: ${this.filename}`;
+  }
+}
+
+export class CyclicImportError extends CompileError {
+  constructor(node: YAMLNode, private readonly rawError: BaseCyclicImportError) {
+    super(node);
+  }
+
+  shortMessage() {
+    const chain = this.rawError.readStack.slice().reverse().map(f => `'${f}'`).join(" -> ");
+    return `Cyclic import is detected. ${chain}`;
   }
 }
 

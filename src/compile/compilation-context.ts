@@ -1,18 +1,23 @@
 import fs from "fs";
 import path from "path";
 import { YAMLNode } from "yaml-ast-parser";
+import * as models from "../model";
 import { MetadataInCompilation } from "./types";
 import { MetadataMapRecord } from "../types/metadata";
-import { CompileError } from "./errors";
+import { CompileError, BaseCyclicImportError } from "./errors";
 
 export class DefaultCompilationContext implements MetadataInCompilation {
   catchCompileError = true;
+  readonly baseDir: string;
   readonly fileMap = new Map<string, string>();
   readonly nodeMap = new Map<any, MetadataMapRecord>();
+  readonly importedStepModels = new Map<string, models.Step[]>();
   readonly caughtErrors: CompileError[] = [];
   private readingFileStack: { name: string }[] = [];
 
-  constructor({ entryFilename, content }: { entryFilename: string, content: string }) {
+  constructor({ baseDir, entryFilename, content }: { baseDir: string, entryFilename: string, content: string }) {
+    this.baseDir = baseDir;
+    entryFilename = path.isAbsolute(entryFilename) ? entryFilename : path.resolve(baseDir, entryFilename);
     this.pushFileState(entryFilename);
     this.fileMap.set(entryFilename, content);
   }
@@ -50,6 +55,9 @@ export class DefaultCompilationContext implements MetadataInCompilation {
   }
 
   pushFileState(name: string) {
+    if (this.readingFileStack.some(s => s.name === name)) {
+      throw new BaseCyclicImportError([...this.readingFileStack, { name }].map(f => path.relative(this.baseDir, f.name)));
+    }
     this.readingFileStack.push({ name });
     return this;
   }

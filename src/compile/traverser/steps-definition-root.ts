@@ -50,14 +50,12 @@ export function extractStepsFromStepsDefinitionRoot(node: YAMLNode, refId: strin
       return pick(hit as YAMLMap, "steps");
     }
   };
-  return withCatchCompileError(() => {
-    let found: YAMLNode | undefined = findSteps(node);
-    if (isSuiteSchema(node)) {
-      found = findSteps(pick(node, "scenario") as YAMLNode);
-    }
-    if (!found) {
-      throw new NoStepsFoundError(node, refId);
-    }
-    return found as YAMLSequence;
-  }, metadata);
+  let found: YAMLNode | undefined = findSteps(node);
+  if (isSuiteSchema(node)) {
+    found = findSteps(pick(node, "scenario") as YAMLNode);
+  }
+  if (!found) {
+    throw new NoStepsFoundError(node, refId);
+  }
+  return found as YAMLSequence;
 }

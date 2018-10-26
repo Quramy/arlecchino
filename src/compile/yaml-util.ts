@@ -105,14 +105,14 @@ export function withValidateBooleanType(node: YAMLNode) {
   throw new NotAllowedValueTypeError(node, "boolean");
 }
 
-export function withCatchCompileError<T extends () => any>(fn: T, metadata: MetadataInCompilation): ReturnType<T> {
+export function withCatchCompileError<T extends () => any>(fn: T, metadata: MetadataInCompilation, defaultValue: any = { }): ReturnType<T> {
   if (!metadata.catchCompileError) return fn();
   try {
     return fn();
   } catch (e) {
     if (e instanceof CompileError) {
       metadata.pushCompieError(e);
-      return ({ } as any) as ReturnType<T>;
+      return defaultValue as ReturnType<T>;
     }
     throw e;
   }

@@ -7,6 +7,7 @@ export class TestExecutionContext extends DefaultExecutionContext {
     super({
       logger: new ConsoleLogger("normal"),
       metadata: {
+        baseDir: "/",
         nodeMap: new Map(),
         fileMap: new Map(),
       },

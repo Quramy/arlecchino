@@ -5,15 +5,16 @@ import { DefaultExecutionContext } from "./runner/execution-context";
 
 export type MainOption = {
   logLevel: LogLevel,
+  baseDir: string,
   suiteFile: string,
   showBrowser?: boolean,
   validateOnly?: boolean,
 };
 
 export async function main(opt: MainOption) {
-  const { suiteFile, logLevel } = opt;
+  const { suiteFile, logLevel, baseDir } = opt;
   const logger = new ConsoleLogger(logLevel);
-  const result = compileFromFile(suiteFile, logger);
+  const result = compileFromFile(baseDir, suiteFile, logger);
   if (!result) return false;
   const { rootModel, metadata } = result;
 
@@ -23,14 +24,14 @@ export async function main(opt: MainOption) {
     return true;
   }
 
-  const ctx = new DefaultExecutionContext({
+  const executionContext = new DefaultExecutionContext({
     logger,
     showBrowser: opt.showBrowser,
     metadata,
   });
-  await ctx.init();
+  await executionContext.init();
 
-  const results = await run(ctx, rootModel); 
-  await ctx.shutdown();
+  const results = await run(executionContext, rootModel); 
+  await executionContext.shutdown();
   return results.every(r => r.result);
 }

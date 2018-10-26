@@ -9,7 +9,7 @@ export type MetadataMapRecord = {
 export type NodeMap = Map<any, MetadataMapRecord>;
 
 export type Metadata = {
-  // currentFilename: string,
+  baseDir: string,
   fileMap: Map<string, string>,
   nodeMap: NodeMap,
 };
