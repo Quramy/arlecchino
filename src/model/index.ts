@@ -146,6 +146,11 @@ export type FileUploadAction = {
   files: TemplateString[],
 };
 
+export type RunScriptStep = {
+  type: "runScript",
+  scriptFilename: string,
+};
+
 export type TemplateString = {
   template: string,
 };

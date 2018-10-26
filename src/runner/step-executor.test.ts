@@ -97,4 +97,17 @@ describe("stepExecutor", () => {
     });
   });
 
+  describe("runScript", () => {
+    it("should execute user defined js", async done => {
+      const { executor, context } = await createContext();
+      await context.currentPage.goto("http://localhost:3000/index.html");
+      await executor.runScript({
+        type: "runScript",
+        scriptFilename: __dirname + "/../../examples/scripts/user_defined_script.js",
+      });
+      expect(context.getVariables().url).toBe("http://localhost:3000/index.html");
+      done();
+    });
+  });
+
 });

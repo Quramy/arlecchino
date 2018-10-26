@@ -84,4 +84,15 @@ export class DefaultStepExecutor implements StepExecutor {
   async echo(step: models.EchoStep) {
     step.messages.forEach(msg => this.context.logger.log(this.evalString(msg)));
   }
+
+  runScript(step: models.RunScriptStep) {
+    // TODO handle module not found error
+    const userDefinedFunction = require(step.scriptFilename);
+    if (typeof userDefinedFunction !== "function") {
+      // TODO
+      throw new Error();
+    }
+    // TODO handle runtime error
+    return Promise.resolve().then(() => userDefinedFunction(this.context));
+  }
 }
