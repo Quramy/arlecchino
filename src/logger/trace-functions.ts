@@ -3,7 +3,7 @@ import {
   MetadataMapRecord,
 } from "../types/metadata";
 
-export type Range = {
+export type NodePosition = {
   line: number,
   character: number,
 };
@@ -29,7 +29,7 @@ export function getDefinionLinesFromRecord(node: MetadataMapRecord, metadata: Me
   const endLine = endLC.line + 1;
   return {
     filename: node.filename,
-    position: {
+    positionRange: {
       start: startLC,
       end: endLC,
     },
@@ -47,7 +47,7 @@ export function getDefinionFromRecord(node: MetadataMapRecord, metadata: Metadat
   const endLine = Math.min(lines.length, endLC.line + arround + 1);
   return {
     filename: node.filename,
-    position: {
+    positionRange: {
       start: startLC,
       end: endLC,
     },
@@ -85,7 +85,7 @@ export function toLines(contents: string) {
   return arr;
 }
 
-export function toLineAndCharcter(contents: string, pos: number): Range {
+export function toLineAndCharcter(contents: string, pos: number): NodePosition {
   let nextDelim = -1;
   let c = contents;
   let rest = pos;
