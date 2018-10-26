@@ -5,6 +5,7 @@
   "bin": {
     "arlecchino": "built/cli.js"
   },
+  "typings": "built/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test:node": "jest --config jest.config.node.json",
