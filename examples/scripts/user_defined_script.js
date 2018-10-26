@@ -1,4 +1,4 @@
-module.exports = async function (context) {
-  context.assignToStore(["url"], context.currentPage.url());
+module.exports = async function ({ assignToStore, currentPage }) {
+  assignToStore(["url"], currentPage.url());
   return;
 };

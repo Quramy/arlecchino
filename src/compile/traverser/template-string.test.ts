@@ -8,7 +8,7 @@ import { NotAllowedValueTypeError } from "../errors";
 
 describe("createTemplateStringModel", () => {
   it("should throw compile error when value type is not string", () => {
-    const node = load(`0`);
+    const node = load(`- a`);
     expect(() => createTemplateStringModel(node, dummyMetadata()))
       .toThrowError(NotAllowedValueTypeError);
   });

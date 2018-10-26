@@ -1,4 +1,3 @@
-import path from "path";
 import { ElementHandle } from "puppeteer";
 
 import { ExecutionContext } from "./types";
@@ -113,7 +112,7 @@ export class ElementFinder {
       } else if (action.type === "textInput") {
         return await this.eh.type(this.context.evaluateValue(action.value));
       } else if (action.type === "fileUpload") {
-        return await this.eh.uploadFile.apply(this.eh, action.files.map(f => path.resolve(path.dirname(action.referencedBy), this.context.evaluateValue(f))));
+        return await this.eh.uploadFile.apply(this.eh, action.files.map(f => this.context.evaluateFileReference(f)));
       }
     });
   }

@@ -1,0 +1,7 @@
+description: Run script
+configuration:
+  base_uri: http://localhost:3000
+steps:
+  - goto: /index.html
+  - run_script: scripts/user_defined_script.js
+  - echo: "{{{ url }}}"

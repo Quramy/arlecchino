@@ -4,10 +4,18 @@ import { Logger } from "../logger";
 import { Metadata } from "../types/metadata";
 import { AccessorExpression } from "../accessor";
 
-export interface Counter {
-  getAndIncrement(): number;
-  get(): number;
-  reset(): void;
+export interface ArlecchinoContext {
+  readonly logger: Logger;
+  readonly resultWriter: ResultWriter;
+  readonly browser: Browser;
+  readonly currentPage: Page; 
+  readonly visible: boolean;
+  readonly stepExecutor: StepExecutor;
+  readonly currentConfiguration: models.Configuration;
+  evaluateValue(opt: models.TemplateString): string;
+  evaluateFileReference(opt: models.FileReference): string;
+  getVariables(): any;
+  assignToStore(expression: AccessorExpression, value: any): void;
 }
 
 export interface ResultWriter {
@@ -25,20 +33,18 @@ export type PreparePageOptions = {
   scenarioName: string,
 };
 
-export interface ExecutionContext {
-  readonly logger: Logger;
-  readonly resultWriter: ResultWriter;
-  readonly counters: { screenshot: Counter };
+export interface Counter {
+  getAndIncrement(): number;
+  get(): number;
+  reset(): void;
+}
+
+export interface ExecutionContext extends ArlecchinoContext {
   readonly metadata: Metadata;
-  readonly browser: Browser;
-  readonly currentPage: Page; 
-  readonly currentConfiguration: models.Configuration;
-  readonly visible: boolean;
-  readonly stepExecutor: StepExecutor;
+  readonly counters: { screenshot: Counter };
   init(): Promise<void>;
   shutdown(): Promise<void>;
   flush(): Promise<void>;
   preparePage(opt: PreparePageOptions): Promise<void>;
-  evaluateValue(opt: models.TemplateString): string;
-  assignToStore(expression: AccessorExpression, value: any): void;
+  publish(): ArlecchinoContext;
 }

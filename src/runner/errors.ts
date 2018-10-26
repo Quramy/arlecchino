@@ -33,3 +33,23 @@ export class NoElementFoundError extends StepExecutionError {
     return `Can't find element: ${this.key}: ${this.val}`;
   }
 }
+
+export class NoResolvedScriptError extends StepExecutionError {
+  constructor(step: models.RunScriptStep, private readonly msg: string) {
+    super(step);
+  }
+
+  shortMessage() {
+    return this.msg;
+  }
+}
+
+export class ScriptExportTypeMismatchError extends StepExecutionError {
+  constructor(step: models.RunScriptStep, private readonly exportedType: string) {
+    super(step);
+  }
+
+  shortMessage() {
+    return `Exported type is ${this.exportedType}. It must be function type.`;
+  }
+}

@@ -2,6 +2,7 @@ import { Page, Browser } from "puppeteer";
 import * as models from "../model";
 import { TestExecutionContext } from "./testing";
 import { DefaultStepExecutor } from "./step-executor";
+import { ScriptExportTypeMismatchError, NoResolvedScriptError } from "./errors";
 
 // browser and page are exposed by jest-puppeteer
 declare var browser: Browser;
@@ -103,10 +104,47 @@ describe("stepExecutor", () => {
       await context.currentPage.goto("http://localhost:3000/index.html");
       await executor.runScript({
         type: "runScript",
-        scriptFilename: __dirname + "/../../examples/scripts/user_defined_script.js",
+        scriptFile: {
+          template: "../../examples/scripts/user_defined_script.js",
+          referencedBy: __filename,
+        },
       });
       expect(context.getVariables().url).toBe("http://localhost:3000/index.html");
       done();
+    });
+
+    it("should throw an error when the script can't be resolved", async done => {
+      const { executor, context } = await createContext();
+      await context.currentPage.goto("http://localhost:3000/index.html");
+      try {
+        await executor.runScript({
+          type: "runScript",
+          scriptFile: {
+            template: "__no_existing_file__",
+            referencedBy: __filename,
+          }
+        });
+      } catch (e) {
+        expect(e instanceof NoResolvedScriptError).toBeTruthy();
+        done();
+      }
+    });
+
+    it("should throw an error when the script does not export function type", async done => {
+      const { executor, context } = await createContext();
+      await context.currentPage.goto("http://localhost:3000/index.html");
+      try {
+        await executor.runScript({
+          type: "runScript",
+          scriptFile: {
+            template: "../../examples/scripts/invalid_type.js",
+            referencedBy: __filename,
+          }
+        });
+      } catch (e) {
+        expect(e instanceof ScriptExportTypeMismatchError).toBeTruthy();
+        done();
+      }
     });
   });
 

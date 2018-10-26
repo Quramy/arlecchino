@@ -37,7 +37,8 @@ export type Step =
   FindStep |
   PauseModel |
   EchoStep |
-  ReserveNextDialogAnswerStep
+  ReserveNextDialogAnswerStep |
+  RunScriptStep
 ;
 
 export type SleepStep = {
@@ -142,15 +143,18 @@ export type TextInputAction = {
 
 export type FileUploadAction = {
   type: "fileUpload",
-  referencedBy: string,
-  files: TemplateString[],
+  files: FileReference[],
 };
 
 export type RunScriptStep = {
   type: "runScript",
-  scriptFilename: string,
+  scriptFile: FileReference,
 };
 
 export type TemplateString = {
   template: string,
+};
+
+export type FileReference = TemplateString & {
+  referencedBy: string,
 };
