@@ -3,7 +3,7 @@ import * as schema from "../../schema";
 import * as models from "../../model";
 import { MetadataInCompilation as Metadata } from "../types";
 import { setMetadata, hasKey, convertMapping, normalizeOneOrMany, withValidateMappingType, withValidateNonNullMaping, withCatchCompileError } from "../yaml-util";
-import { createTemplateStringModel } from "./template-string";
+import { createTemplateStringModel, createFileReferenceModel } from "./template-string";
 import { parse } from "../../accessor";
 import { createAccessorExpression } from "./accessor-expression";
 import { NotMatchedSequenceItemError } from "../errors";
@@ -63,17 +63,12 @@ export function createFindStepActionModels(node: YAMLNode, metadata: Metadata): 
       obj = { type: "submit" } as models.SubmitAction;
     } else if (hasKey(x, "input")) {
       obj = convertMapping<schema.FindInputAction, models.TextInputAction>(x, {
-        input: ["value", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
-      }, {
-        type: "textInput",
-      });
+        input: ["value", n => createTemplateStringModel(n, metadata)],
+      }, { type: "textInput" }, { requiredKeys: ["input"] });
     } else if (hasKey(x, "upload")) {
       obj = convertMapping<schema.FindUploadAction, models.FileUploadAction>(x, {
-        upload: ["files", (n: YAMLNode) => normalizeOneOrMany(n).map(nn => createTemplateStringModel(nn, metadata))],
-      }, {
-        type: "fileUpload",
-        referencedBy: metadata.currentFilename,
-      });
+        upload: ["files", n => normalizeOneOrMany(n).map(nn => createFileReferenceModel(nn, metadata))],
+      }, { type: "fileUpload" }, { requiredKeys: ["upload"] });
     } else {
       // TODO
       throw new Error();

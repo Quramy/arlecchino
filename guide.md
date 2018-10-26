@@ -21,6 +21,10 @@
     - [Examples](#examples-4)
   + [Reserve dialog answer](#reserve-dialog-answer)
     - [Examples](#examples-5)
+  + [Run script](#run-script)
+    - [Examples](#examples-6)
+  + [Import steps](#import-steps)
+    - [Specify steps using reference ID](#specify-steps-using-reference-id)
 
 ## Scenario
 
@@ -357,6 +361,32 @@ steps:
 steps:
   - reserve_dialog_answer:
       text: prompt message
+```
+
+### Run script
+`run_script` step allows to execute an external JavaScript function.
+
+It invokes the function with [ArlecchinoContext](src/runner/types.ts), which includes Puppeteer's Browser instance, Page instance and some Arlecchino's utilities.
+
+#### Examples
+
+```yaml
+steps:
+  - run_script: my_script.js
+```
+
+```js
+// my_script.js
+module.exports = async function({ currentPage, resultWriter }) {
+
+  // currentPage is a Puppeteer page instance
+  const cookies = await currentPage.evaluate(() => {
+    return Promise.resolve(document.cookie.split(";"));
+  });
+
+  // write JSON file into result directory
+  await resultWriter.writeObjAsJson("cookies.json", cookies);
+};
 ```
 
 ### Import steps

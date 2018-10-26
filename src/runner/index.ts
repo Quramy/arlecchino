@@ -1,9 +1,10 @@
 import * as models from "../model";
 
-import { NoElementFoundError } from "./errors";
+import { StepExecutionError } from "./errors";
 import { ExecutionContext } from "./types";
 import { mergeConfiguration } from "./merge-configuration";
 import { runSequential } from "./util";
+import { logWithDefinition } from "../logger/log-with-definition";
 
 export async function run(ctx: ExecutionContext, rootModel: models.RootModel) {
   return await runSequential(rootModel.scenarios, async (scenario) => {
@@ -17,15 +18,14 @@ export async function run(ctx: ExecutionContext, rootModel: models.RootModel) {
       });
       ctx.flush();
       return { scenarioName: scenario.description, result: true };
-    } catch (e) {
+    } catch (error) {
       ctx.flush();
-      if (e instanceof NoElementFoundError) {
-        ctx.logger.error(`Can't find element: ${e.key}: ${e.val}`);
-        const traceMessage = e.traceMessage(ctx.metadata);
-        if (traceMessage) ctx.logger.error(traceMessage);
+      if (error instanceof StepExecutionError) {
+        const msg = error.shortMessage();
+        logWithDefinition(ctx.logger, ctx.metadata, error, msg);
         return { scenarioName: scenario.description, result: false };
       }
-      throw e;
+      throw error;
     }
   });
 }

@@ -2,6 +2,7 @@ import * as models from "../model";
 import { sleep } from "./util";
 import { ExecutionContext, StepExecutor } from "./types";
 import { ElementFinder } from "./element-finder";
+import { ScriptExportTypeMismatchError, NoResolvedScriptError } from "./errors";
 
 export class DefaultStepExecutor implements StepExecutor {
 
@@ -83,5 +84,21 @@ export class DefaultStepExecutor implements StepExecutor {
 
   async echo(step: models.EchoStep) {
     step.messages.forEach(msg => this.context.logger.log(this.evalString(msg)));
+  }
+
+  runScript(step: models.RunScriptStep) {
+    const filename = this.context.evaluateFileReference(step.scriptFile);
+    try {
+      require.resolve(filename);
+    } catch (err) {
+      throw new NoResolvedScriptError(step, err.message);
+    }
+    const userDefinedFunction = require(filename);
+    if (typeof userDefinedFunction !== "function") {
+      throw new ScriptExportTypeMismatchError(step, typeof userDefinedFunction);
+    }
+
+    // Not handle user script thrown error
+    return Promise.resolve().then(() => userDefinedFunction(this.context.publish()));
   }
 }

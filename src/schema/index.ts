@@ -41,7 +41,9 @@ export type Step =
   ScreenshotStep |
   WaitForNavigationStep |
   FindStep |
-  PauseStep
+  PauseStep |
+  EchoStep |
+  RunScriptStep
 ;
 
 export type ImportSteps = {
@@ -122,4 +124,8 @@ export type FindInputAction = {
 
 export type FindUploadAction = {
   upload: string | string[],
+};
+
+export type RunScriptStep = {
+  run_script: string,
 };

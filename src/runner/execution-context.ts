@@ -1,3 +1,4 @@
+import path from "path";
 import { Page, Browser, launch } from "puppeteer";
 
 import {
@@ -10,7 +11,7 @@ import { Logger } from "../logger";
 import { Metadata } from "../types/metadata";
 import * as models from "../model";
 
-import { ExecutionContext, Counter, StepExecutor, ResultWriter, PreparePageOptions } from "./types";
+import { ExecutionContext, Counter, StepExecutor, ResultWriter, PreparePageOptions, ArlecchinoContext } from "./types";
 import { DefaultResultWriter } from "./result-writer";
 import { DefaultStepExecutor } from "./step-executor";
 import { SimpleCounter, sleep } from "./util";
@@ -101,8 +102,14 @@ export class DefaultExecutionContext implements ExecutionContext {
     };
   }
 
-  evaluateValue({ template }: { template: string }) {
+  evaluateValue({ template }: models.TemplateString) {
     return mustacheRender(template, this.getVariables());
+  }
+
+  evaluateFileReference(opt: models.FileReference) {
+    const filename = this.evaluateValue(opt);
+    if (path.isAbsolute(filename)) return filename;
+    return path.resolve(this.metadata.baseDir, path.dirname(opt.referencedBy), filename);
   }
 
   assignToStore(expression: AccessorExpression, value: any) {
@@ -127,5 +134,22 @@ export class DefaultExecutionContext implements ExecutionContext {
 
   get stepExecutor() {
     return this._stepExecutor;
+  }
+
+  publish() {
+    const ctx: ArlecchinoContext = {
+      logger: this.logger,
+      resultWriter: this.resultWriter,
+      browser: this.browser,
+      currentPage: this.currentPage,
+      visible: this.visible,
+      stepExecutor: this.stepExecutor,
+      currentConfiguration: this.currentConfiguration,
+      evaluateValue: this.evaluateValue.bind(this),
+      evaluateFileReference: this.evaluateFileReference.bind(this),
+      getVariables: this.getVariables.bind(this),
+      assignToStore: this.assignToStore.bind(this),
+    };
+    return Object.seal(ctx);
   }
 }

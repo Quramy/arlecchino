@@ -37,6 +37,7 @@ export function compileFromText(baseDir: string, textContent: string, filename: 
   return {
     rootModel,
     metadata: {
+      baseDir,
       fileMap: context.fileMap,
       nodeMap: context.nodeMap,
     } as BaseMetadata,

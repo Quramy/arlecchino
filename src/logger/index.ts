@@ -10,7 +10,7 @@ export interface Logger {
   error(...msg: string[]): any;
 }
 
-export class ConsoleLogger {
+export class ConsoleLogger implements Logger {
   level: LogLevel = "normal";
   chalk: Chalk;
 

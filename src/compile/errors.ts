@@ -1,8 +1,8 @@
 import path from "path";
 import { YAMLNode, YamlMap as YAMLMap, YAMLMapping, YAMLSequence } from "yaml-ast-parser";
-import chalk, { Chalk } from "chalk";
 import { MetadataInCompilation as Metadata } from "./types";
 import { getDefinionFromRecord, getDefinionLinesFromRecord } from "../logger/trace-functions";
+import { DefinitionAccessor } from "../logger/types";
 
 export class BaseCyclicImportError extends Error {
   constructor(public readonly readStack: string[]) {
@@ -10,15 +10,13 @@ export class BaseCyclicImportError extends Error {
   }
 }
 
-export abstract class CompileError extends Error {
+export abstract class CompileError extends Error implements DefinitionAccessor<Metadata> {
 
   readonly node: YAMLNode;
-  chalk!: Chalk;
   private occurringFilename?: string;
 
   constructor(node: YAMLNode) {
     super();
-    this.chalk = chalk;
     this.node = node;
   }
 

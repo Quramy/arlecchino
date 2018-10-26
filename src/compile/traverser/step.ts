@@ -12,6 +12,7 @@ import { isEchoStepNode, createEchoStepModel } from "./echo-step";
 import { NotMatchedSequenceItemError } from "../errors";
 import { isReserveDialogAnswerStepNode, createReserveNextDialogAnswerStepModel } from "./reserve-dialog-answer-step";
 import { isImportStepsNode, importSteps } from "./import-steps";
+import { isRunScriptStepNode, createRunScriptStepModel } from "./run-script-step";
 
 export function createStepModels(node: YAMLNode, metadata: Metadata): models.Step[] {
   return withCatchCompileError(() => setMetadata(withValidateSequenceType(node).items.reduce((acc, n) => {
@@ -33,6 +34,8 @@ export function createStepModels(node: YAMLNode, metadata: Metadata): models.Ste
       return [...acc, createEchoStepModel(n, metadata)];
     } else if (isReserveDialogAnswerStepNode(n)) {
       return [...acc, createReserveNextDialogAnswerStepModel(n, metadata)];
+    } else if (isRunScriptStepNode(n)) {
+      return [...acc, createRunScriptStepModel(n, metadata)];
     } else {
       throw new NotMatchedSequenceItemError(n);
     }
