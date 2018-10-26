@@ -10,6 +10,7 @@ class TestingMetadata extends DefaultCompilationContext implements MetadataInCom
 
   constructor(opt: TestingMetadataOptions = { }) {
     super({
+      baseDir: "",
       entryFilename: "test",
       content: "",
     });

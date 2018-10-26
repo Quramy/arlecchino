@@ -3,6 +3,7 @@ import {
   YAMLNode,
   YAMLSequence,
   YAMLMapping,
+  YamlMap as YAMLMap,
 } from "yaml-ast-parser";
 import * as schema from "../../schema";
 import * as models from "../../model";
@@ -12,7 +13,7 @@ import { createConfigurationModel } from "./configuration";
 import { createStepModels } from "./step";
 
 
-export function isSuiteSchema(node: YAMLNode) {
+export function isSuiteSchema(node: YAMLNode): node is YAMLMap {
   return hasKey(node, "scenario");
 }
 export function createRootModel(node: YAMLNode, metadata: Metadata): models.RootModel {

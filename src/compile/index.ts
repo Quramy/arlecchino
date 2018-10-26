@@ -8,10 +8,10 @@ import { createRootModel } from "./traverser/suite";
 import { createLoggingCompileErrorsHandler } from "./error-handler";
 import { DefaultCompilationContext } from "./compilation-context";
 
-export function compileFromFile(filename: string, logger: Logger) {
+export function compileFromFile(baseDir: string, filename: string, logger: Logger) {
   let textContent: string;
   try {
-    textContent = fs.readFileSync(filename, "utf8");
+    textContent = fs.readFileSync(path.join(baseDir, filename), "utf8");
   } catch (e) {
     if (e.message) {
       logger.error(`Cannot open '${filename}'.`);
@@ -19,11 +19,12 @@ export function compileFromFile(filename: string, logger: Logger) {
     } 
     throw e;
   }
-  return compileFromText(textContent, filename, createLoggingCompileErrorsHandler(logger));
+  return compileFromText(baseDir, textContent, filename, createLoggingCompileErrorsHandler(logger));
 }
 
-export function compileFromText(textContent: string, filename: string, errorHandler?: CompileErrorsHandler) {
+export function compileFromText(baseDir: string, textContent: string, filename: string, errorHandler?: CompileErrorsHandler) {
   const context = new DefaultCompilationContext({
+    baseDir,
     entryFilename: filename,
     content: textContent,
   });

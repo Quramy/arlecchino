@@ -21,6 +21,7 @@ if (!cliOptions.argv._.length) {
 }
 
 const opt = {
+  baseDir: process.cwd(),
   logLevel: cliOptions.argv.verbose ? "verbose" : cliOptions.argv.quiet ? "silent" : "normal",
   showBrowser: cliOptions.argv.showBrowser,
   validateOnly: cliOptions.argv.test,

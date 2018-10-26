@@ -358,3 +358,72 @@ steps:
   - reserve_dialog_answer:
       text: prompt message
 ```
+
+### Import steps
+
+`import_steps` is a special step. Strictly it's not a step, but it's allowed to be written as steps sequence items.
+You can refactor your scenarios or implement "Page Object Pattern" test using this.
+
+It imports steps defined in other files statically and expand them.
+
+```yaml
+# main.yml
+description: Main scenario
+steps:
+  - import_steps: login.yml
+  - wait_for_navigation
+  - echo: Success!
+```
+
+```yaml
+# login.yml
+steps:
+  - goto: /login
+  - find:
+      query: input[type='submit']
+      action: click
+```
+
+The above example results the following.
+
+```yaml
+description: Main scenario
+steps:
+  - goto: /login
+  - find:
+      query: input[type='submit']
+      action: click
+  - wait_for_navigation
+  - echo: Success!
+```
+
+A steps file to be imported only needs to have `steps:` definition.
+So, any scenario file also is importable.
+
+#### Specify steps using reference ID
+
+Sometimes a YAML file has multiple `steps` mappings.
+In such a case you must specify which steps to import using `ref_id`.
+
+You need to write `import_steps: <file name>$<ref_id>` to specify steps with the reference ID and add `ref_id:` key to the file to be imported.
+
+```yaml
+# main.yml
+description: Main scenario
+steps:
+  - import_steps: po.yml$open
+  - import_steps: po.yml$submit
+```
+
+```yaml
+# po.yml
+- ref_id: open
+  steps:
+    - goto: /login
+- ref_id: submit
+  steps:
+    - find:
+        query: input[type='submit']
+        action: click
+    - wait_for_navigation
+```

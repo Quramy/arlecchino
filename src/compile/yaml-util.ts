@@ -4,7 +4,7 @@ import {
   YAMLMapping,
   YAMLSequence,
 } from "yaml-ast-parser";
-import { MetadataInCompilation, YAMLNumberValueNode, YAMLBooleanValueNode } from "./types";
+import { MetadataInCompilation, YAMLNumberValueNode, YAMLBooleanValueNode, YAMLStringValueNode } from "./types";
 import { NotAllowedValueTypeError, NoRequiredValueError, NotAllowedKeyError, RequiredKeyNotExistError, CompileError } from "./errors";
 
 export type MappingDefinitionOptions<T> = {
@@ -43,9 +43,19 @@ export function convertMapping<T, S>(node: YAMLNode, map: MappingDefinition<T, S
   return Object.assign(defaultValue, ret) as S;
 }
 
+export function isSequence(node: YAMLNode): node is YAMLSequence {
+  return !!(node as any)["items"]
+}
+
 export function hasKey(node: YAMLNode, k: string): node is YAMLMap {
   if (!node.mappings) return false;
   return (node.mappings as any[]).map((v: { key: YAMLNode }) => v.key.value as string).some(key => key === k);
+}
+
+export function pick(node: YAMLMap, k: string) {
+  const hit = node.mappings.find((n: YAMLMapping) => n.key.value === k);
+  if (!hit) return;
+  return hit.value;
 }
 
 export function normalizeOneOrMany(node: YAMLNode): YAMLNode[] {
@@ -76,7 +86,7 @@ export function withValidateNonNullMaping(node: YAMLMapping) {
 
 export function withValidateStringType(node: YAMLNode) {
   if (typeof node.value === "string") {
-    return node;
+    return node as YAMLStringValueNode;
   }
   throw new NotAllowedValueTypeError(node, "string");
 }
@@ -95,14 +105,14 @@ export function withValidateBooleanType(node: YAMLNode) {
   throw new NotAllowedValueTypeError(node, "boolean");
 }
 
-export function withCatchCompileError<T extends () => any>(fn: T, metadata: MetadataInCompilation): ReturnType<T> {
+export function withCatchCompileError<T extends () => any>(fn: T, metadata: MetadataInCompilation, defaultValue: any = { }): ReturnType<T> {
   if (!metadata.catchCompileError) return fn();
   try {
     return fn();
   } catch (e) {
     if (e instanceof CompileError) {
-      metadata.caughtErrors.push(e);
-      return ({ } as any) as ReturnType<T>;
+      metadata.pushCompieError(e);
+      return defaultValue as ReturnType<T>;
     }
     throw e;
   }

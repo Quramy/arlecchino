@@ -11,27 +11,30 @@ import { setMetadata, withCatchCompileError, withValidateSequenceType } from "..
 import { isEchoStepNode, createEchoStepModel } from "./echo-step";
 import { NotMatchedSequenceItemError } from "../errors";
 import { isReserveDialogAnswerStepNode, createReserveNextDialogAnswerStepModel } from "./reserve-dialog-answer-step";
+import { isImportStepsNode, importSteps } from "./import-steps";
 
 export function createStepModels(node: YAMLNode, metadata: Metadata): models.Step[] {
-  return withCatchCompileError(() => setMetadata(withValidateSequenceType(node).items.map(n => {
-    if (isScreenshotStepNode(n)) {
-      return createScreenshotStepModel(n, metadata);
+  return withCatchCompileError(() => setMetadata(withValidateSequenceType(node).items.reduce((acc, n) => {
+    if (isImportStepsNode(n)) {
+      return [...acc, ...importSteps(n, metadata)];
+    } else if (isScreenshotStepNode(n)) {
+      return [...acc, createScreenshotStepModel(n, metadata)];
     } else if (isGotoStepNode(n)) {
-      return createGotoStepModel(n, metadata);
+      return [...acc, createGotoStepModel(n, metadata)];
     } else if (isWaitForNavigationStepNode(n)) {
-      return createWaitForNavigationStepModel(n, metadata);
+      return [...acc, createWaitForNavigationStepModel(n, metadata)];
     } else if (isFindStepNode(n)) {
-      return createFindStepModel(n, metadata);
+      return [...acc, createFindStepModel(n, metadata)];
     } else if (isSleepStepNode(n)) {
-      return createSleepStep(n, metadata);
+      return [...acc, createSleepStep(n, metadata)];
     } else if (isPauseStepNode(n)) {
-      return createPauseStepModel(n, metadata);
+      return [...acc, createPauseStepModel(n, metadata)];
     } else if (isEchoStepNode(n)) {
-      return createEchoStepModel(n, metadata);
+      return [...acc, createEchoStepModel(n, metadata)];
     } else if (isReserveDialogAnswerStepNode(n)) {
-      return createReserveNextDialogAnswerStepModel(n, metadata);
+      return [...acc, createReserveNextDialogAnswerStepModel(n, metadata)];
     } else {
       throw new NotMatchedSequenceItemError(n);
     }
-  }) as models.Step[], metadata, node), metadata);
+  }, [] as models.Step[]) as models.Step[], metadata, node), metadata);
 }

@@ -1,18 +1,24 @@
 import fs from "fs";
 import path from "path";
 import { YAMLNode } from "yaml-ast-parser";
+import * as models from "../model";
 import { MetadataInCompilation } from "./types";
 import { MetadataMapRecord } from "../types/metadata";
+import { CompileError, BaseCyclicImportError } from "./errors";
 
 export class DefaultCompilationContext implements MetadataInCompilation {
-  currentFilename: string;
   catchCompileError = true;
+  readonly baseDir: string;
   readonly fileMap = new Map<string, string>();
   readonly nodeMap = new Map<any, MetadataMapRecord>();
-  readonly caughtErrors = [];
+  readonly importedStepModels = new Map<string, models.Step[]>();
+  readonly caughtErrors: CompileError[] = [];
+  private readingFileStack: { name: string }[] = [];
 
-  constructor({ entryFilename, content }: { entryFilename: string, content: string }) {
-    this.currentFilename = entryFilename;
+  constructor({ baseDir, entryFilename, content }: { baseDir: string, entryFilename: string, content: string }) {
+    this.baseDir = baseDir;
+    entryFilename = path.isAbsolute(entryFilename) ? entryFilename : path.resolve(baseDir, entryFilename);
+    this.pushFileState(entryFilename);
     this.fileMap.set(entryFilename, content);
   }
 
@@ -35,5 +41,32 @@ export class DefaultCompilationContext implements MetadataInCompilation {
       absPath: filename,
       content,
     }
+  }
+
+  get currentFilename() {
+    return this.readingFileStack[this.readingFileStack.length - 1].name;
+  }
+
+  pushCompieError(error: CompileError) {
+    if (!this.caughtErrors) return this;
+    error.setOccurringFilename(this.currentFilename);
+    this.caughtErrors.push(error);
+    return this;
+  }
+
+  pushFileState(name: string) {
+    if (this.readingFileStack.some(s => s.name === name)) {
+      throw new BaseCyclicImportError([...this.readingFileStack, { name }].map(f => path.relative(this.baseDir, f.name)));
+    }
+    this.readingFileStack.push({ name });
+    return this;
+  }
+
+  popFileState() {
+    const state = this.readingFileStack.pop();
+    if (!state) {
+      throw new Error();
+    }
+    return state.name;
   }
 }

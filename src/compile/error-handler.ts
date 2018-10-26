@@ -1,3 +1,4 @@
+import path from "path";
 import { MetadataInCompilation as Metadata, CompileErrorsHandler } from "./types";
 import { CompileError } from "./errors";
 import { Logger } from "../logger";
@@ -19,7 +20,7 @@ function logError(logger: Logger, metadata: Metadata, error: CompileError) {
     return;
   }
 
-  const errorPosition = logger.chalk.gray(`${def.filename}:${def.position.start.line + 1}:${def.position.end.character + 1}`);
+  const errorPosition = logger.chalk.gray(`${path.relative(metadata.baseDir, def.filename)}:${def.position.start.line + 1}:${def.position.end.character + 1}`);
   logger.error(errorPosition, msg);
   const startLine = def.position.start.line + 1;
   const lastLine = def.position.end.line + 1;
