@@ -70,8 +70,7 @@ export function createFindStepActionModels(node: YAMLNode, metadata: Metadata): 
         upload: ["files", n => normalizeOneOrMany(n).map(nn => createFileReferenceModel(nn, metadata))],
       }, { type: "fileUpload" }, { requiredKeys: ["upload"] });
     } else {
-      // TODO
-      throw new Error();
+      throw new NotMatchedSequenceItemError(x);
     }
     return setMetadata(obj, metadata, x);
   }) as models.FindStepAction[], metadata, node), metadata);
