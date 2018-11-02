@@ -12,6 +12,7 @@
     - [Do action to the found element](#do-action-to-the-found-element)
     - [Extract data from the found element](#extract-data-from-the-found-element)
     - [Traverse found DOM tree](#traverse-found-dom-tree)
+    - [Reuse found element](#reuse-found-element)
     - [Examples](#examples-1)
   + [Sleep](#sleep)
     - [Examples](#examples-2)
@@ -252,37 +253,70 @@ find:
     - first_child
 ```
 
+#### Reuse found element
+
+You can reuse the found element at the previous find step using a special query `$0`.
+
+```yaml
+steps:
+  - find:
+      query: .some-class
+  # other steps
+  - find:
+      query: $0 # <- point to the element found at the previous find step
+```
+
+And query starting with `$0` such as `$0 .foo` searches for an element inside the last found element.
+
 #### Examples
 
 ```yaml
 steps:
-  find:
-    query: .title
+  - find:
+      query: .title
 ```
 
 ```yaml
 steps:
-  find:
-    query: h1
-    with_text: Title
-    store:
-      from: html
-      to: "h1.html"
+  - find:
+      query: h1
+      with_text: Title
+      store:
+        from: html
+        to: "h1.html"
 ```
 
 ```yaml
 steps:
-  find:
-    query: input[name='email']
-    action:
-      inupt: you@example.com
-  find:
-    query: input[type='file']
-    action:
-      upload: my_profile.png
-  find:
-    query: input[type='submit']
-    action: click
+  - find:
+      query: tbody tr:first-child > td
+      store:
+        from text
+        to: first_row_value
+  - find:
+      query: $0
+      traverse:
+        - parent
+        - next
+        - first_child
+      store:
+        from text
+        to: second_row_value
+```
+
+```yaml
+steps:
+  - find:
+      query: input[name='email']
+      action:
+        inupt: you@example.com
+  - find:
+      query: input[type='file']
+      action:
+        upload: my_profile.png
+  - find:
+      query: input[type='submit']
+      action: click
 ```
 
 ### Sleep
