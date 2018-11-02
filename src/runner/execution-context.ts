@@ -1,5 +1,5 @@
 import path from "path";
-import { Page, Browser, launch } from "puppeteer";
+import { Page, Browser, launch, ElementHandle } from "puppeteer";
 
 import {
   render as mustacheRender,
@@ -27,6 +27,7 @@ export class DefaultExecutionContext implements ExecutionContext {
   readonly resultWriter: ResultWriter;
   readonly counters: { screenshot: Counter };
   readonly metadata: Metadata;
+  latestElementHandle: ElementHandle | null = null;
   private readonly options: ContextCreateOptions;
   protected _currentPage!: Page;
   protected _browser!: Browser;
@@ -54,6 +55,10 @@ export class DefaultExecutionContext implements ExecutionContext {
 
   protected async clearBrowser() {
     if (this._currentPage) {
+      if (this.latestElementHandle) {
+        await this.latestElementHandle.dispose();
+        this.latestElementHandle = null;
+      }
       await this._currentPage.close();
     }
     if (this._browser) {
@@ -142,6 +147,7 @@ export class DefaultExecutionContext implements ExecutionContext {
       resultWriter: this.resultWriter,
       browser: this.browser,
       currentPage: this.currentPage,
+      latestElementHandle: this.latestElementHandle,
       visible: this.visible,
       stepExecutor: this.stepExecutor,
       currentConfiguration: this.currentConfiguration,

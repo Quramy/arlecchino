@@ -1,4 +1,4 @@
-import { Browser, Page } from "puppeteer";
+import { Browser, Page, ElementHandle } from "puppeteer";
 import * as models from "../model";
 import { Logger } from "../logger";
 import { Metadata } from "../types/metadata";
@@ -12,6 +12,7 @@ export interface ArlecchinoContext {
   readonly visible: boolean;
   readonly stepExecutor: StepExecutor;
   readonly currentConfiguration: models.Configuration;
+  readonly latestElementHandle: ElementHandle | null;
   evaluateValue(opt: models.TemplateString): string;
   evaluateFileReference(opt: models.FileReference): string;
   getVariables(): any;
@@ -42,6 +43,7 @@ export interface Counter {
 export interface ExecutionContext extends ArlecchinoContext {
   readonly metadata: Metadata;
   readonly counters: { screenshot: Counter };
+  latestElementHandle: ElementHandle | null;
   init(): Promise<void>;
   shutdown(): Promise<void>;
   flush(): Promise<void>;

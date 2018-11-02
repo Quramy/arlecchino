@@ -53,3 +53,13 @@ export class ScriptExportTypeMismatchError extends StepExecutionError {
     return `Exported type is ${this.exportedType}. It must be function type.`;
   }
 }
+
+export class PuppeteerEvaluationError extends StepExecutionError {
+  constructor(step: models.Step, private readonly msg: string) {
+    super(step);
+  }
+
+  shortMessage() {
+    return this.msg;
+  }
+}
