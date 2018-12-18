@@ -10,6 +10,10 @@ export function mergeConfiguration(...configurations: models.Configuration[]): m
         ...acc.viewport,
         ...conf.viewport,
       },
+      directVariables: {
+        ...acc.directVariables,
+        ...conf.directVariables,
+      },
       importVariables: {
         ...acc.importVariables,
         ...conf.importVariables,

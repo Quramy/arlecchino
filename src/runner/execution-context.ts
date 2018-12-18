@@ -99,9 +99,11 @@ export class DefaultExecutionContext implements ExecutionContext {
 
   getVariables() {
     // TODO should be support to replacement for the included variables?
-    const variables = { ...this.currentConfiguration.importVariables };
+    const importedVars = { ...this.currentConfiguration.importVariables };
+    const directVars = { ...this.currentConfiguration.directVariables };
     return {
-      ...variables,
+      ...importedVars,
+      ...directVars,
       ...this._storedValue,
       $env: process.env,
     };
