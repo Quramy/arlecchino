@@ -3,7 +3,7 @@
 * [Scenario](#scenario)
 * [Configuration](#configuration)
   + [Base URI](#base-uri)
-  + [Import variables](#import-variables)
+  + [Variables](#import-variables)
   + [Viewport](#viewport)
 * [Step Reference](#step-reference)
   + [Goto](#goto)
@@ -69,7 +69,7 @@ steps:
 
 `base_uri` sets the default URI prefix. See also [Goto step](#goto).
 
-### Import variables
+### Variables
 Almost all string fields in steps(e.g. find query, goto url) accept a template placeholder using `"{{ ... }}"` notation.
 The variables used in templates can be defined in external files.
 And you can import the external files using `import_var`.
@@ -94,6 +94,18 @@ login_page: http://localhost/login.html
 ```
 
 *Arlecchino* can read not only YAML but also JSON.
+
+And you can also write variables directly in scenario files.
+
+```yaml
+# scenario.yml
+
+configuration:
+  var:
+    login_page: http://localhost/login.html
+steps:
+  - goto: "{{ login_page }}"
+```
 
 ### Viewport
 

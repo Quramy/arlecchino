@@ -1,7 +1,28 @@
 import { load } from "yaml-ast-parser";
 import { dummyMetadata } from "../testing";
-import { createImportVariables } from "./configuration";
+import { createDirectVariables, createImportVariables } from "./configuration";
 import { ImportFileNotFoundError, NotAllowedValueTypeError } from "../errors";
+
+describe("createDirectVariables", () => {
+  it("should return model correctly", () => {
+    const node = load(`
+      a: str
+      b: 100
+      c: true
+    `);
+    const context = dummyMetadata();
+    expect(createDirectVariables(node, context)).toEqual({ a: "str", b: 100, c: true });
+  });
+
+  it("should ignore nested hash", () => {
+    const node = load(`
+      hoge: 
+        fuga: 100
+    `);
+    const context = dummyMetadata();
+    expect(createDirectVariables(node, context)).toEqual({ });
+  });
+})
 
 describe("createImportVariables", () => {
   it("should return model correctly from YAML", () => {
@@ -64,3 +85,4 @@ describe("createImportVariables", () => {
     expect(() => createImportVariables(node, context)).toThrowError(ImportFileNotFoundError);
   });
 });
+

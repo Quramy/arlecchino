@@ -11,6 +11,7 @@ export type Configuration = {
   viewport?: ViewportObject,
   include_var?: ImportVar,
   import_var?: ImportVar,
+  var?: any,
 };
 
 export type ImportVar = string | string[];

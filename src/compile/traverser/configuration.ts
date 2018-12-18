@@ -10,6 +10,7 @@ import {
   normalizeOneOrMany,
   convertMapping,
   withCatchCompileError,
+  withValidateMappingType,
   withValidateBooleanType,
   withValidateNumberType,
   withValidateStringType,
@@ -20,6 +21,7 @@ import { createTemplateStringModel } from "./template-string";
 export function createConfigurationModel(node: YAMLNode, metadata: Metadata): models.Configuration {
   return withCatchCompileError(() => setMetadata(convertMapping<schema.Configuration, models.Configuration>(node, {
     base_uri: ["baseUri", (n: YAMLNode) => createTemplateStringModel(n, metadata)],
+    "var": ["directVariables", (n: YAMLNode) => createDirectVariables(n, metadata)],
     include_var: ["importVariables", (n: YAMLNode) => createImportVariables(n, metadata)],  // secret
     import_var: ["importVariables", (n: YAMLNode) => createImportVariables(n, metadata)],
     viewport: ["viewport", (n: YAMLNode) => createViewportModel(n, metadata)],
@@ -44,6 +46,23 @@ export function createViewportModel(node: YAMLNode, metadata: Metadata): models.
       value: vpObj,
     } as models.Viewport, metadata, node);
   }
+}
+
+export function createDirectVariables(node: YAMLNode, metadata: Metadata) {
+  return withCatchCompileError(() => {
+    const ymlMap = withValidateMappingType(node);
+    return ymlMap.mappings.reduce((acc, m) => {
+      const key = m.key.value;
+      let value = m.value.valueObject;
+      if (!value && typeof m.value.value === "string") {
+        value = m.value.value
+      }
+      return {
+        ...acc,
+        [key]: value,
+      };
+    }, { })
+  }, metadata);
 }
 
 export function createImportVariables(node: YAMLNode, metadata: Metadata) {
