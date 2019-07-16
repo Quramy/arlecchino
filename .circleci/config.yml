@@ -18,13 +18,14 @@ jobs:
           - v1-dependencies-
 
       - run: yarn install --frozen-lockfile
+      - run: yarn bootstrap
       - run: yarn build
       - run:
           name: boot dummy server
-          command: yarn e2e:serve:dev
+          command: yarn start:test-server
           background: true
       - run: yarn test
-      - run: sh scripts/e2e.sh
+      - run: sh packages/arlecchino-cli/scripts/e2e.sh
 
       - save_cache:
           paths:
@@ -44,6 +45,8 @@ jobs:
             - npm-cache-{{ checksum "yarn.lock" }}
             - npm-cache
       - run: yarn install --frozen-lockfile
+      - run: yarn bootstrap
+      - run: yarn build
       - run:
           name: Login npm
           command: |
@@ -51,7 +54,7 @@ jobs:
       - run:
           name: Publish
           command: |
-            npm publish
+            yarn publish:npm
 
 workflows:
   version: 2

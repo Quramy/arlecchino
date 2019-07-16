@@ -1,0 +1,57 @@
+{
+  "name": "arlecchino",
+  "version": "0.0.14",
+  "description": "YAML based e2e runner",
+  "bin": {
+    "arlecchino": "built/cli.js"
+  },
+  "typings": "built/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test:node": "jest --config jest.config.node.json",
+    "test:browser": "jest --config jest.config.browser.json",
+    "test": "npm run test:node && npm run test:browser",
+    "e2e:serve:dev": "ts-node-dev e2e/server.ts",
+    "prepare": "rimraf built && tsc && cpy ../../README.md ./"
+  },
+  "keywords": [
+    "puppeteer",
+    "yaml",
+    "e2e"
+  ],
+  "author": "Quramy",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quramy/arlecchino.git"
+  },
+  "homepage": "https://github.com/Quramy/arlecchino",
+  "devDependencies": {
+    "@types/express": "^4.16.0",
+    "@types/jest": "^24.0.15",
+    "express": "^4.16.4",
+    "jest": "^24.8.0",
+    "jest-puppeteer": "^4.3.0",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.3.0",
+    "ts-node-dev": "^1.0.0-pre.30",
+    "typescript": "~3.5.0"
+  },
+  "dependencies": {
+    "@types/chalk": "^2.2.0",
+    "@types/js-yaml": "^3.11.2",
+    "@types/mkdirp": "^0.5.2",
+    "@types/mustache": "^0.8.31",
+    "@types/puppeteer": "^1.8.0",
+    "@types/rimraf": "^2.0.2",
+    "@types/yargs": "^13.0.0",
+    "chalk": "^2.4.1",
+    "js-yaml": "^3.12.0",
+    "mkdirp": "^0.5.1",
+    "mustache": "^3.0.0",
+    "puppeteer": "^1.8.0",
+    "rimraf": "^2.6.2",
+    "yaml-ast-parser": "^0.0.43",
+    "yargs": "^13.3.0"
+  }
+}
