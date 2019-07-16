@@ -6,7 +6,8 @@
     "build": "lerna run build",
     "start:test-server": "lerna run --scope=\"arlecchino\" e2e:serve:dev",
     "test": "lerna run test",
-    "publish:npm": "lerna publish --from-package"
+    "bump": "lerna version",
+    "publish:npm": "lerna publish from-package --yes"
   },
   "devDependencies": {
     "cpy-cli": "^2.0.0",
