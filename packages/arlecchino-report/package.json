@@ -19,7 +19,10 @@
     "lib"
   ],
   "dependencies": {
-    "arlecchino-report-interface": "^0.0.15"
+    "@types/mkdirp": "^0.5.2",
+    "@types/node": "^12.6.4",
+    "arlecchino-report-interface": "^0.0.15",
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {
     "typescript": "~3.5.0"
