@@ -11,7 +11,9 @@
   },
   "devDependencies": {
     "cpy-cli": "^2.0.0",
-    "lerna": "^3.15.0"
+    "lerna": "^3.15.0",
+    "rimraf": "^2.6.3",
+    "typescript": "~3.5.0"
   },
   "workspaces": [
     "packages/*"

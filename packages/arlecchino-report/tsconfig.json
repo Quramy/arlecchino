@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "arlecchino-report-interface": ["./arlecchino-report-interface/src/index.ts"],
+      "arlecchino-report-interface/*": ["./arlecchino-report-interface/src/*"]
+    }
+  }
+}
