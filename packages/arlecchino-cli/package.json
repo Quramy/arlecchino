@@ -1,6 +1,6 @@
 {
   "name": "arlecchino",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "YAML based e2e runner",
   "bin": {
     "arlecchino": "built/cli.js"
