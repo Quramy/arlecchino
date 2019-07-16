@@ -18,6 +18,7 @@ jobs:
           - v1-dependencies-
 
       - run: yarn install --frozen-lockfile
+      - run: yarn bootstrap
       - run: yarn build
       - run:
           name: boot dummy server
@@ -44,6 +45,8 @@ jobs:
             - npm-cache-{{ checksum "yarn.lock" }}
             - npm-cache
       - run: yarn install --frozen-lockfile
+      - run: yarn bootstrap
+      - run: yarn build
       - run:
           name: Login npm
           command: |
@@ -51,7 +54,7 @@ jobs:
       - run:
           name: Publish
           command: |
-            npm publish
+            yarn publish:npm
 
 workflows:
   version: 2

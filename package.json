@@ -5,9 +5,11 @@
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
     "start:test-server": "lerna run --scope=\"arlecchino\" e2e:serve:dev",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "publish:npm": "lerna publish --from-package"
   },
   "devDependencies": {
+    "cpy-cli": "^2.0.0",
     "lerna": "^3.15.0"
   },
   "workspaces": [
