@@ -2,11 +2,13 @@
 
 set -eux
 
-ARLECCHINO="node built/cli.js"
+BASE_DIR="packages/arlecchino-cli"
 
-$ARLECCHINO examples/use-variables.yml
-$ARLECCHINO examples/file-upload.yml
-$ARLECCHINO examples/table.yml
-$ARLECCHINO examples/dialog.yml
-$ARLECCHINO examples/import-steps.yml
-$ARLECCHINO examples/escape-hatches.yml
+ARLECCHINO="node ${BASE_DIR}/built/cli.js"
+
+$ARLECCHINO ${BASE_DIR}/examples/use-variables.yml
+$ARLECCHINO ${BASE_DIR}/examples/file-upload.yml
+$ARLECCHINO ${BASE_DIR}/examples/table.yml
+$ARLECCHINO ${BASE_DIR}/examples/dialog.yml
+$ARLECCHINO ${BASE_DIR}/examples/import-steps.yml
+$ARLECCHINO ${BASE_DIR}/examples/escape-hatches.yml

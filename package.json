@@ -1,6 +1,16 @@
 {
+  "name": "arlecchino",
   "private": true,
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "build": "lerna run build",
+    "start:test-server": "lerna run --scope=\"arlecchino\" e2e:serve:dev",
+    "test": "lerna run test"
+  },
   "devDependencies": {
     "lerna": "^3.15.0"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

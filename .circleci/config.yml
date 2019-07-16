@@ -21,10 +21,10 @@ jobs:
       - run: yarn build
       - run:
           name: boot dummy server
-          command: yarn e2e:serve:dev
+          command: yarn start:test-server
           background: true
       - run: yarn test
-      - run: sh scripts/e2e.sh
+      - run: sh packages/arlecchino-cli/scripts/e2e.sh
 
       - save_cache:
           paths:
