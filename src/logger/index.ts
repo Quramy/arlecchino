@@ -19,7 +19,7 @@ export class ConsoleLogger implements Logger {
     this.chalk = require("chalk") as Chalk;
   }
 
-  debug(...msg: string[]) {
+  debug(...msg: [string?, ...string[]]) {
     if (this.level === "verbose") {
       console.log.apply(console, msg);
     }
@@ -31,13 +31,13 @@ export class ConsoleLogger implements Logger {
     }
   }
 
-  log(...msg: string[]) {
+  log(...msg: [string?, ...string[]]) {
     if (this.level !== "silent") {
       console.log.apply(console, msg);
     }
   }
 
-  error(...msg: string[]) {
+  error(...msg: [string?, ...string[]]) {
     if (this.level !== "silent") {
       console.error.apply(console, msg);
     }
