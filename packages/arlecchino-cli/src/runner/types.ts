@@ -41,6 +41,7 @@ export interface Counter {
 }
 
 export interface ExecutionContext extends ArlecchinoContext {
+  readonly outDir: string;
   readonly metadata: Metadata;
   readonly counters: { screenshot: Counter };
   latestElementHandle: ElementHandle | null;

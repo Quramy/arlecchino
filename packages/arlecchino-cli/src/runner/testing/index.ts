@@ -6,6 +6,7 @@ export class TestExecutionContext extends DefaultExecutionContext {
   constructor (browser: Browser, page: Page) {
     super({
       logger: new ConsoleLogger("normal"),
+      outDir: "result",
       metadata: {
         baseDir: "/",
         nodeMap: new Map(),

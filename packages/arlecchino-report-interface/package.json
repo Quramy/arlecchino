@@ -1,0 +1,31 @@
+{
+  "name": "arlecchino-report-interface",
+  "version": "0.0.15",
+  "description": "interface for arlecchino report",
+  "author": "Yosuke Kurami <yosuke.kurami@gmail.com>",
+  "homepage": "https://github.com/Quramy/arlecchino#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "test": "echo \"Nothing to do\"",
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "rimraf lib && npm run build"
+  },
+  "files": [
+    "lib"
+  ],
+  "devDependencies": {
+    "typescript": "~3.5.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Quramy/arlecchino.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Quramy/arlecchino/issues"
+  }
+}

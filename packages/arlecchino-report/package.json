@@ -1,0 +1,40 @@
+{
+  "name": "arlecchino-report",
+  "version": "0.0.15",
+  "description": "write arlecchino report",
+  "keywords": [
+    "arlecchino"
+  ],
+  "author": "Yosuke Kurami <yosuke.kurami@gmail.com>",
+  "homepage": "https://github.com/Quramy/arlecchino",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "echo \"TBD\"",
+    "prepare": "rimraf lib && npm run build"
+  },
+  "files": [
+    "lib"
+  ],
+  "dependencies": {
+    "@types/mkdirp": "^0.5.2",
+    "@types/node": "^12.6.4",
+    "arlecchino-report-interface": "^0.0.15",
+    "mkdirp": "^0.5.1"
+  },
+  "devDependencies": {
+    "typescript": "~3.5.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Quramy/arlecchino.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Quramy/arlecchino/issues"
+  }
+}

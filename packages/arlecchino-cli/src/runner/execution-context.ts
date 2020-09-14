@@ -15,15 +15,18 @@ import { ExecutionContext, Counter, StepExecutor, ResultWriter, PreparePageOptio
 import { DefaultResultWriter } from "./result-writer";
 import { DefaultStepExecutor } from "./step-executor";
 import { SimpleCounter, sleep } from "./util";
+import { scenarioNameToPrefix } from "./filename-functions";
 
 export type ContextCreateOptions = {
   logger: Logger,
   showBrowser?: boolean,
   metadata: Metadata,
+  outDir: string,
 };
 
 export class DefaultExecutionContext implements ExecutionContext {
   readonly logger: Logger;
+  readonly outDir: string;
   readonly resultWriter: ResultWriter;
   readonly counters: { screenshot: Counter };
   readonly metadata: Metadata;
@@ -37,6 +40,7 @@ export class DefaultExecutionContext implements ExecutionContext {
 
   constructor(opt: ContextCreateOptions) {
     this.options = opt;
+    this.outDir = opt.outDir;
     this.logger = opt.logger;
     this.counters = { screenshot: new SimpleCounter() };
     this.resultWriter = new DefaultResultWriter();
@@ -74,8 +78,7 @@ export class DefaultExecutionContext implements ExecutionContext {
 
   async preparePage({ conf, scenarioName }: PreparePageOptions) {
     await this.clearBrowser();
-    // TODO use out dir of cnofig
-    this.resultWriter.setPrefix("result/" + scenarioName.replace(/\s+/g, "_"));
+    this.resultWriter.setPrefix(scenarioNameToPrefix(this.options.outDir, scenarioName));
     this._storedValue = { };
     this.counters.screenshot.reset();
     this._currentConfiguration = conf;
